@@ -1,10 +1,9 @@
 # from collections import Counter for counting instances of phrase
-# Need to remove commas, full stops etc.
 
-# To get rid of punctuation:
-# https://stackoverflow.com/questions/15547409/how-to-get-rid-of-punctuation-using-nltk-tokenizer
+# Need to remove grams with numbers in them
 
 from nltk import ngrams
+import re
 
 # For testing N-gram creation
 test_sentence = "The quick brown fox jumps over the lazy dog."
@@ -28,13 +27,18 @@ of thrust each. The future holds an advanced super-sonic jet with a saving of
 almost 40 percent in fuel usage.
 """
 
-n_2 = 2
-n_3 = 3
-n_4 = 4
-n_5 = 5
-n_6 = 6
 
-fourgrams = ngrams(test_double_sentence.split(), n_4)
+def create_ngram(string, num):
+    # Removes punctuation and special characters from string
+    clean_string = re.sub('\W+', ' ', string).lower()
 
-for grams in fourgrams:
-    print(grams)
+    x_grams = ngrams(clean_string.split(), num)
+    x_gram_list = []
+
+    for gram in x_grams:
+        x_gram_list.append(gram)
+
+    return x_gram_list
+
+
+print(create_ngram(test_paragraph, 3))

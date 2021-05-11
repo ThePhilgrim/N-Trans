@@ -2,7 +2,7 @@
 
 ## Introduction
 
-N-Trans creates a database of the X most common N-grams in the English language from
+N-Trans creates a database of the X most common N-grams (https://en.wikipedia.org/wiki/N-gram) in the English language from
 the American Google Corpus (https://www.english-corpora.org/googlebooks/x.asp).
 
 Thereafter, it uses Google Translate (https://translate.google.com/) to translate the N-grams into a chosen
