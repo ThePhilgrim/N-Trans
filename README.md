@@ -28,6 +28,10 @@ To activate a virtual environment:
 
 #### NLTK (Docs: https://www.nltk.org/)
 
+To install NLTK:
+- MAC OS:
+  `python3 -m pip install nltk`
+
 #### googletrans (Docs: https://pypi.org/project/googletrans/)
 
 
