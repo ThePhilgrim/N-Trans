@@ -1,43 +1,38 @@
-# from collections import Counter for counting instances of phrase
-
-# Need to remove grams with numbers in them
-
 from nltk import ngrams
 import re
+import collections
 
-# For testing N-gram creation
-test_sentence = "The quick brown fox jumps over the lazy dog."
 
-# For testing N-gram counting
-test_double_sentence = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
-
-# For testing on larger text
-test_paragraph = """
-December 17, 1903, is the birth date of all airplanes.
-Orville and Wilbur Wright started building gliders in 1900. In 1903, they built
-a motor and propeller for their glider. Orville made the first flight, which
-lasted 12 seconds, and flew 120 feet. Wilbur's flight was 852 feet in 59 seconds.
-These first flights in 1903 were just the start of the evolution of planes.
-By the year 1909, Bleriot had crossed the English Channel. By the year 1912,
-a two-piece plywood fuselage was built for greater strength. By the 1930s,
-the all-metal fuselage was tried, and it soon appeared in DC3s. From the Wrights'
-1903 motor and prop came the engines for the 1950 turbojet that generated at least
-19,600 pounds of thrust. The big Boeing 747 has four engines with 50,000 pounds
-of thrust each. The future holds an advanced super-sonic jet with a saving of
-almost 40 percent in fuel usage.
+# String for testing
+test_string = """
+This is a sentence that will appear one time. Now this would be a sentence that appears 0 times. That's because there is a number in it. The number was a 0. Okay, this is a sentence that will appear twice. Okay, this is a sentence that will appear twice. I will also include a sentence that appear like ten times. This is it! This is it! This is it! This is it! This is it! This is it! This is it! This is it! This is it! This is it! Now the question is if this is enough. Maybe I should add a sentence that shows up a few more times? No, that's it. I'm done. I'm tired of coming up with new sentences that don't make any sense. That's it.. I'm done. Good bye! See ya later alligator. In a while, crocodile.
 """
 
 
-def create_ngram(string, num):
-    # Removes punctuation and special characters from string
-    clean_string = re.sub('\W+', ' ', string).lower()
+def count_ngram_frequency(gram_list, x_most_common_grams):
+    return collections.Counter(gram_list).most_common(x_most_common_grams)
 
-    x_grams = ngrams(clean_string.split(), num)
+
+def create_ngram(string, n_gram_length, x_most_common):
+    '''
+    Strips string from special characters, creates tuple n_grams, deletes tuples
+    with numbers, joins tuples into strings
+    '''
+
+    # Determines the size of the returned dictionary from count_ngram_frequency()
+    x_most_common_grams = x_most_common
+
+    # Removes punctuation and special characters from string.
+    clean_string = re.sub(r"[^\w']+", " ", string).lower()
+
+    # Splits string into N-grams and adds them to tuple_list.
+    x_grams = ngrams(clean_string.split(), n_gram_length)
     tuple_list = []
 
     for gram in x_grams:
         tuple_list.append(gram)
 
+    # Joins tuples into strings, and deletes strings with numbers.
     gram_list = []
 
     for tuple in tuple_list:
@@ -45,7 +40,15 @@ def create_ngram(string, num):
         if not any(char.isdigit() for char in joined_tuple):
             gram_list.append(joined_tuple)
 
-    return gram_list
+    return count_ngram_frequency(gram_list, x_most_common_grams)
 
 
-print(create_ngram(test_paragraph, 3))
+"""
+CODE TESTING:
+"""
+
+# x_gram_length = int(input("How many words do you want to split your N-grams into? (int): "))
+
+# list_length = int(input("How many of the most common N-grams do you want to produce? (int): "))
+
+print(create_ngram(test_string, 6, 100))

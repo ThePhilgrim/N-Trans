@@ -43,7 +43,10 @@ To install NLTK:
   `python3 -m pip install nltk`
 
 
-#### Re
+#### Re (https://docs.python.org/3/library/re.html)
+
+
+#### collections.Counter (https://docs.python.org/3/library/collections.html)
 
 
 #### googletrans (Docs: https://pypi.org/project/googletrans/)
