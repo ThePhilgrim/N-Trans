@@ -1,12 +1,27 @@
 from nltk import ngrams
+from googletrans import Translator
 import re
 import collections
 
 
 # String for testing
 test_string = """
-This is a sentence that will appear one time. Now this would be a sentence that appears 0 times. That's because there is a number in it. The number was a 0. Okay, this is a sentence that will appear twice. Okay, this is a sentence that will appear twice. I will also include a sentence that appear like ten times. This is it! This is it! This is it! This is it! This is it! This is it! This is it! This is it! This is it! This is it! Now the question is if this is enough. Maybe I should add a sentence that shows up a few more times? No, that's it. I'm done. I'm tired of coming up with new sentences that don't make any sense. That's it.. I'm done. Good bye! See ya later alligator. In a while, crocodile.
+The bikers rode down the long and narrow path to reach the city park. When they reached a good spot to rest, they began to look for signs of spring. The sun was bright, and a lot of bright red and blue blooms proved to all that warm spring days were the very best. Spring rides were planned. They had a burger at the lake and then rode farther up the mountain. As one rider started to get off his bike, he slipped and fell. One of the other bikers saw him fall but could do nothing to help him. Neither the boy nor the bike got hurt. After a brief stop, everyone was ready to go on. All the bikers enjoyed the nice view when they came to the top. All the roads far below them looked like ribbons. A dozen or so boats could be seen on the lake. It was very quiet and peaceful and no one wished to leave. As they set out on their return, they all enjoyed the ease of pedaling. The bikers came upon a new bike trail. This route led to scenery far grander than that seen from the normal path. The end of the day brought laughs and cheers from everyone. The fact that each person was very, very tired did not keep anyone from eagerly planning for the exciting ride to come.
 """
+
+
+def machine_translate_ngrams(n_gram_list, language=None):
+    translated_ngram_list = []
+
+    translator = Translator()
+
+    translated_ngrams = translator.translate(n_gram_list, dest='sv')  # TODO: Change language to variable
+
+    for translated_ngram in translated_ngrams:
+        source_and_target = translated_ngram.origin[0], translated_ngram.text
+        translated_ngram_list.append(source_and_target)
+
+    return translated_ngram_list
 
 
 def count_ngram_frequency(gram_list, x_most_common_grams):
@@ -27,20 +42,18 @@ def create_ngram(string, n_gram_length, x_most_common):
 
     # Splits string into N-grams and adds them to tuple_list.
     x_grams = ngrams(clean_string.split(), n_gram_length)
-    tuple_list = []
-
-    for gram in x_grams:
-        tuple_list.append(gram)
 
     # Joins tuples into strings, and deletes strings with numbers.
-    gram_list = []
+    n_gram_list = []
 
-    for tuple in tuple_list:
+    for tuple in x_grams:
         joined_tuple = ' '.join(tuple)
         if not any(char.isdigit() for char in joined_tuple):
-            gram_list.append(joined_tuple)
+            n_gram_list.append(joined_tuple)
 
-    return count_ngram_frequency(gram_list, x_most_common_grams)
+    prepared_ngram_list = count_ngram_frequency(n_gram_list, x_most_common_grams)
+
+    return machine_translate_ngrams(prepared_ngram_list)
 
 
 """
@@ -51,4 +64,4 @@ CODE TESTING:
 
 # list_length = int(input("How many of the most common N-grams do you want to produce? (int): "))
 
-print(create_ngram(test_string, 6, 100))
+print(create_ngram(test_string, 3, 10))

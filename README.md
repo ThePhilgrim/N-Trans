@@ -51,6 +51,14 @@ To install NLTK:
 
 #### googletrans (Docs: https://pypi.org/project/googletrans/)
 
+Googletrans is currently having issues with bulk translations. Currently 3.1.0a0
+seems to be a stable version and is therefore recommended.
+
+To install googletrans:
+- MAC OS:
+  `python3 -m pip install googletrans==3.1.0a0
+
+`
 
 
 ### Tools
