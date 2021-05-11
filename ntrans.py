@@ -33,12 +33,19 @@ def create_ngram(string, num):
     clean_string = re.sub('\W+', ' ', string).lower()
 
     x_grams = ngrams(clean_string.split(), num)
-    x_gram_list = []
+    tuple_list = []
 
     for gram in x_grams:
-        x_gram_list.append(gram)
+        tuple_list.append(gram)
 
-    return x_gram_list
+    gram_list = []
+
+    for tuple in tuple_list:
+        joined_tuple = ' '.join(tuple)
+        if not any(char.isdigit() for char in joined_tuple):
+            gram_list.append(joined_tuple)
+
+    return gram_list
 
 
 print(create_ngram(test_paragraph, 3))
