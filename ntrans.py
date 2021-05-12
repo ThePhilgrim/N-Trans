@@ -1,6 +1,4 @@
 from nltk import ngrams
-
-# from googletrans import Translator
 import translatepy
 import re
 import collections
@@ -26,64 +24,59 @@ Far far away, behind the word mountains, far from the countries Vokalia and Cons
 """
 
 
-def machine_translate_ngrams(prepared_ngram_list, language=None):
-    translated_ngram_list = []
+def machine_translate_ngrams(list_of_ngrams, language=None):
 
     translator = translatepy.Translator()
 
-    for count, list_item in enumerate(prepared_ngram_list, start=1):
-        print(f"Translating item {count}/{len(prepared_ngram_list)}")
+    source_target_pairs = []
+
+    for enum_count, list_item in enumerate(list_of_ngrams, start=1):
+        print(f"Translating item {enum_count}/{len(list_of_ngrams)}")
         translated_string = translator.translate(
             list_item, "Swedish"
         )  # TODO: Change to language variable
-        print(list_item + " --> " + str(translated_string))
-        source_target_tuple = list_item, str(translated_string).lower()
-        translated_ngram_list.append(source_target_tuple)
+        # print(list_item + " --> " + str(translated_string))
+        # source_target_tuple = list_item, str(translated_string).lower()
+        source_target_pairs.append((list_item, str(translated_string).lower()))
 
-    return translated_ngram_list
-
-
-def count_ngram_frequency(gram_list, x_most_common_grams):
-    print("Starting to count in function no 2")
-    counted = collections.Counter(gram_list).most_common(x_most_common_grams)
-
-    return [ngram[0] for ngram in counted]
+    return source_target_pairs
 
 
-def create_ngram(string, n_gram_length, x_most_common):
+def count_ngram_frequency(ngram_strings, desired_data_size):
+    x_most_common_ngrams = collections.Counter(ngram_strings).most_common(desired_data_size)
+
+    return [ngram[0] for ngram in x_most_common_ngrams]
+
+
+def create_ngrams(text, ngram_size, desired_data_size):
     """
     Strips string from special characters, creates tuple n_grams, deletes tuples
     with numbers, joins tuples into strings
     """
 
-    # Determines the size of the returned dictionary from count_ngram_frequency()
-    x_most_common_grams = x_most_common
-
     # Removes punctuation and special characters from string.
-    clean_string = re.sub(r"[^\w']+", " ", string).lower()
+    text_without_punctuation = re.sub(r"[^\w']+", " ", text).lower()
 
     # Splits string into N-grams and adds them to tuple_list.
-    x_grams = ngrams(clean_string.split(), n_gram_length)
+    generated_ngram_tuples = ngrams(text_without_punctuation.split(), ngram_size)
 
     # Joins tuples into strings, and deletes strings with numbers.
-    n_gram_list = []
+    ngram_strings = []
 
-    for tuple in x_grams:
-        joined_tuple = " ".join(tuple)
+    for generated_ngram_tuple in generated_ngram_tuples:
+        joined_tuple = " ".join(generated_ngram_tuple)
         if not any(char.isdigit() for char in joined_tuple):
-            n_gram_list.append(joined_tuple)
+            ngram_strings.append(joined_tuple)
 
-    prepared_ngram_list = count_ngram_frequency(n_gram_list, x_most_common_grams)
-
-    return machine_translate_ngrams(prepared_ngram_list)
+    return machine_translate_ngrams(count_ngram_frequency(ngram_strings, desired_data_size))
 
 
 """
 CODE TESTING:
 """
 
-# x_gram_length = int(input("How many words do you want to split your N-grams into? (int): "))
+# ngram_size = int(input("How many words do you want to split your N-grams into? (int): "))
 
-# list_length = int(input("How many of the most common N-grams do you want to produce? (int): "))
+# desired_data_size = int(input("How many of the most common N-grams do you want to produce? (int): "))
 
-print(create_ngram(test_text_short, 3, 300))
+print(create_ngrams(test_text_short, 3, 15))
