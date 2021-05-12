@@ -30,14 +30,14 @@ def machine_translate_ngrams(list_of_ngrams, language=None):
 
     source_target_pairs = []
 
-    for enum_count, list_item in enumerate(list_of_ngrams, start=1):
+    for enum_count, source_string in enumerate(list_of_ngrams, start=1):
         print(f"Translating item {enum_count}/{len(list_of_ngrams)}")
         translated_string = translator.translate(
-            list_item, "Swedish"
+            source_string, "Swedish"
         )  # TODO: Change to language variable
         # print(list_item + " --> " + str(translated_string))
         # source_target_tuple = list_item, str(translated_string).lower()
-        source_target_pairs.append((list_item, str(translated_string).lower()))
+        source_target_pairs.append((source_string, str(translated_string).lower()))
 
     return source_target_pairs
 
