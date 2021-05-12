@@ -49,16 +49,11 @@ To install NLTK:
 #### collections.Counter (https://docs.python.org/3/library/collections.html)
 
 
-#### googletrans (Docs: https://pypi.org/project/googletrans/)
+#### translatepy (Docs: https://github.com/Animenosekai/translate)
 
-Googletrans is currently having issues with bulk translations. Currently 3.1.0a0
-seems to be a stable version and is therefore recommended.
-
-To install googletrans:
+To install translatepy:
 - MAC OS:
-  `python3 -m pip install googletrans==3.1.0a0
-
-`
+  `python3 -m pip install translatepy`
 
 
 ### Tools
