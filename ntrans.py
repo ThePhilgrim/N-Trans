@@ -10,12 +10,12 @@ The bikers rode down the long and narrow path to reach the city park. When they 
 """
 
 
-def machine_translate_ngrams(n_gram_list, language=None):
+def machine_translate_ngrams(prepared_ngram_list, language=None):
     translated_ngram_list = []
 
     translator = Translator()
 
-    translated_ngrams = translator.translate(n_gram_list, dest='sv')  # TODO: Change language to variable
+    translated_ngrams = translator.translate(prepared_ngram_list, dest='sv')  # TODO: Change language to variable
 
     for translated_ngram in translated_ngrams:
         source_and_target = translated_ngram.origin[0], translated_ngram.text
@@ -25,7 +25,9 @@ def machine_translate_ngrams(n_gram_list, language=None):
 
 
 def count_ngram_frequency(gram_list, x_most_common_grams):
-    return collections.Counter(gram_list).most_common(x_most_common_grams)
+    counted = collections.Counter(gram_list).most_common(x_most_common_grams)
+
+    return [ngram[0] for ngram in counted]
 
 
 def create_ngram(string, n_gram_length, x_most_common):
@@ -64,4 +66,6 @@ CODE TESTING:
 
 # list_length = int(input("How many of the most common N-grams do you want to produce? (int): "))
 
-print(create_ngram(test_string, 3, 10))
+create_ngram(test_string, 2, 3)
+
+# print(create_ngram(test_string, 2, 10))
