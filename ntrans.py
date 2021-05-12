@@ -18,7 +18,7 @@ def machine_translate_ngrams(prepared_ngram_list, language=None):
     translated_ngrams = translator.translate(prepared_ngram_list, dest='sv')  # TODO: Change language to variable
 
     for translated_ngram in translated_ngrams:
-        source_and_target = translated_ngram.origin[0], translated_ngram.text
+        source_and_target = translated_ngram.origin, translated_ngram.text
         translated_ngram_list.append(source_and_target)
 
     return translated_ngram_list
@@ -66,6 +66,4 @@ CODE TESTING:
 
 # list_length = int(input("How many of the most common N-grams do you want to produce? (int): "))
 
-create_ngram(test_string, 2, 3)
-
-# print(create_ngram(test_string, 2, 10))
+print(create_ngram(test_string, 2, 10))
