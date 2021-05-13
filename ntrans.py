@@ -2,6 +2,7 @@ from nltk import ngrams
 import translatepy
 import re
 import collections
+import csv
 
 
 # Strings for testing
@@ -24,6 +25,21 @@ Far far away, behind the word mountains, far from the countries Vokalia and Cons
 """
 
 
+def create_csv_file(source_target_pairs, save_path=None):
+    path = "/Users/Writing/Desktop/"  # TODO: Make path depend on user input and use "save_path"
+    filename = "ntrans-glossary.csv"  # TODO: Make filename depend on user input
+    full_path = path + filename
+
+    with open(full_path, mode='w') as write_ntrans_file:
+        data_writer = csv.writer(write_ntrans_file, delimiter=',')
+
+        data_writer.writerow(('English', 'Swedish'))
+        for source_target_pair in source_target_pairs:
+            data_writer.writerow(source_target_pair)
+
+    return print("N-Trans CSV Glossary has been successfully saved to " + full_path)
+
+
 def machine_translate_ngrams(list_of_ngrams, language=None):
 
     translator = translatepy.Translator()
@@ -35,11 +51,11 @@ def machine_translate_ngrams(list_of_ngrams, language=None):
         translated_string = translator.translate(
             source_string, "Swedish"
         )  # TODO: Change to language variable
-        # print(list_item + " --> " + str(translated_string))
+        # print(source_string + " --> " + str(translated_string))
         # source_target_tuple = list_item, str(translated_string).lower()
         source_target_pairs.append((source_string, str(translated_string).lower()))
 
-    return source_target_pairs
+    create_csv_file(source_target_pairs)
 
 
 def count_ngram_frequency(ngram_strings, desired_data_size):
@@ -79,4 +95,4 @@ CODE TESTING:
 
 # desired_data_size = int(input("How many of the most common N-grams do you want to produce? (int): "))
 
-print(create_ngrams(test_text_short, 3, 15))
+create_ngrams(test_text, 5, 50)
