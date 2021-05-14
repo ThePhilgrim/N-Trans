@@ -36,14 +36,17 @@ def download_corpus_data():
         ssl._create_default_https_context = _create_unverified_https_context
 
     # Find what corpora are most suited for N-Trans
-    nltk.download('brown')
+    # nltk.download('brown')
     # nltk.download('reuters')
 
 
     # temporary variables for testing different corpora
     brown_data = ' '.join(nltk.corpus.brown.words())
-    reuters_data = ' '.join(nltk.corpus.reuters.words())
-    return brown_data
+    abc_data = ' '.join(nltk.corpus.abc.words())
+    dependency_treebank_data = ' '.join(nltk.corpus.dependency_treebank.words())
+    movie_data = ' '.join(nltk.corpus.movie_reviews.words())
+    return dependency_treebank_data + ' ' + abc_data + ' ' + brown_data + ' ' + movie_data
+
 
 def create_csv_file(source_target_pairs, save_path=None):
     path = "/Users/Writing/Desktop/"  # TODO: Make path depend on user input and use "save_path"
@@ -91,12 +94,17 @@ def create_ngrams(text, ngram_size, desired_data_size):
     """
 
     # Removes punctuation and special characters from string.
+    # TODO: Make the .replaces more effective
     text_without_punctuation = re.sub(r"[^\w']+", " ", text).lower()
+    text_without_punctuation = text_without_punctuation.replace(" ' ", "'")
+    text_without_punctuation = text_without_punctuation.replace(" '' ", ' ')
+
 
     # Splits string into N-grams and adds them to tuple_list.
     generated_ngram_tuples = ngrams(text_without_punctuation.split(), ngram_size)
 
     # Joins tuples into strings, and deletes strings with numbers.
+    # TODO: Delete anything with "movie" or "film" (because of movie_data)
     ngram_strings = []
 
     for generated_ngram_tuple in generated_ngram_tuples:
@@ -118,4 +126,4 @@ CODE TESTING:
 
 
 corpus_data = download_corpus_data()
-create_ngrams(corpus_data, 4, 50)
+create_ngrams(corpus_data, 3, 100)
