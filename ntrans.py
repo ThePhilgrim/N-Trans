@@ -30,28 +30,6 @@ def prepare_corpus_data(data_size=1000000):
 
     return ' '.join(bnc_sents)
 
-    ### Outdated code. Will be deleted when BNC surely works as data source.
-    # try:
-    #     _create_unverified_https_context = ssl._create_unverified_context
-    # except AttributeError:
-    #     pass
-    # else:
-    #     ssl._create_default_https_context = _create_unverified_https_context
-    #
-    # # Find what corpora are most suited for N-Trans
-    # nltk.download('brown')
-    # nltk.download('abc')
-    # nltk.download('dependency_treebank')
-    # # nltk.download('movie_reviews')
-    #
-    # # temporary variables for testing different corpora
-    # brown_data = ' '.join(nltk.corpus.brown.words())
-    # abc_data = ' '.join(nltk.corpus.abc.words())
-    # dependency_treebank_data = ' '.join(nltk.corpus.dependency_treebank.words())  # Bad for 5-grams
-    # movie_data = ' '.join(nltk.corpus.movie_reviews.words())
-    # return abc_data
-    # # return dependency_treebank_data + ' ' + abc_data + ' ' + brown_data + ' ' + movie_data
-
 
 def create_csv_file(source_target_pairs, save_path=None):
     path = "/Users/Writing/Desktop/"  # TODO: Make path depend on user input and use "save_path"
@@ -86,10 +64,8 @@ def machine_translate_ngrams(list_of_ngrams, language=None):
 
 
 def count_ngram_frequency(ngram_strings, desired_data_size):
-    print('Counting N-gram frequency')
     x_most_common_ngrams = collections.Counter(ngram_strings).most_common(desired_data_size)
-    print(x_most_common_ngrams)
-    # return [ngram[0] for ngram in x_most_common_ngrams]
+    return [ngram[0] for ngram in x_most_common_ngrams]
 
 
 def create_ngrams(corpus_data, ngram_size, desired_data_size):
@@ -99,9 +75,7 @@ def create_ngrams(corpus_data, ngram_size, desired_data_size):
     """
 
     # Removes punctuation and special characters from string.
-    print('Removing punctuation...')
     text_without_punctuation = re.sub(r"[^\w']+", " ", corpus_data).lower()
-    print('Fixing apostrophies...')
 
     # TODO: Make the .replaces more effective
     text_without_punctuation = text_without_punctuation.replace(" '", "'")
@@ -110,7 +84,6 @@ def create_ngrams(corpus_data, ngram_size, desired_data_size):
     # TODO: Put ngram function in for loop to include all N-grams that the user wants.
     # TODO: Switch place of ngram creation and joining ngram_tuples into strings, since joining ngram_tuples takes a long time.
     # Splits string into N-grams and adds them to tuple_list.
-    print('Creating N-grams')
     generated_ngram_tuples = nltk.ngrams(text_without_punctuation.split(), ngram_size)
 
     # Joins tuples into strings, and deletes strings with numbers.
@@ -129,11 +102,6 @@ def create_ngrams(corpus_data, ngram_size, desired_data_size):
 """
 CODE TESTING:
 """
-
-# ngram_size = int(input("How many words do you want to split your N-grams into? (int): "))
-
-# desired_data_size = int(input("How many of the most common N-grams do you want to produce? (int): "))
-
 
 corpus_data = prepare_corpus_data()
 create_ngrams(corpus_data, 2, 100)
