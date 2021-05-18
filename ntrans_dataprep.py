@@ -23,19 +23,19 @@ def write_data_to_csv(n_to_ngrams):
     Writes the N-grams to CSV files. These CSV files are read from ntrans.py
     """
 
-    filenames = ['2-grams', '3-grams', '4-grams', '5-grams', '6-grams']
-    pathlib.Path('ngrams').mkdir(exist_ok=True)
+    filenames = ["2-grams", "3-grams", "4-grams", "5-grams", "6-grams"]
+    pathlib.Path("ngrams").mkdir(exist_ok=True)
 
     for n, counter in n_to_ngrams.items():
 
         # "n - 2" to get index of "filenames"
-        file_path = './ngrams/' + filenames[n - 2] + '.csv'
+        file_path = "./ngrams/" + filenames[n - 2] + ".csv"
 
-        with open(file_path, mode='w') as write_data_file:
-            data_writer = csv.writer(write_data_file, delimiter=',')
+        with open(file_path, mode="w") as write_data_file:
+            data_writer = csv.writer(write_data_file, delimiter=",")
 
             for ngram, count in counter.most_common():
-                csv_row = [' '.join(ngram), str(count)]
+                csv_row = [" ".join(ngram), str(count)]
                 data_writer.writerow(csv_row)
 
 
