@@ -29,7 +29,7 @@ def write_data_to_csv(n_to_ngrams):
     for n, counter in n_to_ngrams.items():
 
         # "n - 2" to get index of "filenames"
-        file_path = "./ngrams/" + filenames[n - 2] + ".csv"
+        file_path = f"./ngrams/{n}-grams.csv"
 
         with open(file_path, mode="w") as write_data_file:
             data_writer = csv.writer(write_data_file, delimiter=",")
