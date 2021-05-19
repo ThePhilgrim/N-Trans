@@ -15,6 +15,9 @@ http://www.ota.ox.ac.uk/desc/2554
 
 Unzip BNC to the working directory, and rename the folder `BNC`.
 
+NOTE: The BNC contains around 112.000.000 words (or 5.397.000 sentences).
+It can take around 2 hours to run this script.
+
 """
 
 
@@ -23,18 +26,15 @@ def write_data_to_csv(n_to_ngrams):
     Writes the N-grams to CSV files. These CSV files are read from ntrans.py
     """
 
-    filenames = ["2-grams", "3-grams", "4-grams", "5-grams", "6-grams"]
     pathlib.Path("ngrams").mkdir(exist_ok=True)
 
-    for n, counter in n_to_ngrams.items():
-
-        # "n - 2" to get index of "filenames"
+    for n, collections_counter in n_to_ngrams.items():
         file_path = f"./ngrams/{n}-grams.csv"
 
         with open(file_path, mode="w") as write_data_file:
             data_writer = csv.writer(write_data_file)
 
-            for ngram, count in counter.most_common():
+            for ngram, count in collections_counter.most_common():
                 csv_row = [" ".join(ngram), str(count)]
                 data_writer.writerow(csv_row)
 
@@ -43,6 +43,8 @@ def count_ngram_frequency(n_to_ngrams):
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
+
+    # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
     write_data_to_csv({
         n: collections.Counter(ngrams)
         for n, ngrams in n_to_ngrams.items()
@@ -74,7 +76,9 @@ def generate_ngrams():
         root="BNC/Texts/", fileids=r"[A-K]/\w*/\w*\.xml"
     )
 
-    for count, sentence in enumerate(bnc_corpus.sents()[:100]):
+    # To work with a sample size of the BNC, add a range in sents().
+    # For example "for count, sentence in enumerate(bnc_corpus.sents()[:1000]):"
+    for count, sentence in enumerate(bnc_corpus.sents()):
 
         # Ignores any sentence that contains numbers
         if any(char.isdigit() for word in sentence for char in word):
@@ -86,7 +90,8 @@ def generate_ngrams():
             index for index, word in enumerate(sentence) if "'" in word
         ]
         for index in reversed(contraction_index):
-            sentence[index - 1] += sentence.pop(index)
+            if index != 0:
+                sentence[index - 1] += sentence.pop(index)
 
         # Removes all punctuation except apostrophies
         processed_sentence = [re.sub(r"[^\w']+", "", word.lower()) for word in sentence]
