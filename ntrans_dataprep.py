@@ -45,10 +45,9 @@ def count_ngram_frequency(n_to_ngrams):
     """
 
     # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
-    write_data_to_csv({
-        n: collections.Counter(ngrams)
-        for n, ngrams in n_to_ngrams.items()
-    })
+    write_data_to_csv(
+        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}
+    )
 
 
 def generate_ngrams():
