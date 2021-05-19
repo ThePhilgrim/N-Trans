@@ -2,6 +2,7 @@ import csv
 import collections
 import re
 import nltk
+import pathlib
 
 """
 DEVELOPER INFO:
@@ -14,39 +15,40 @@ http://www.ota.ox.ac.uk/desc/2554
 
 Unzip BNC to the working directory, and rename the folder `BNC`.
 
+NOTE: The BNC contains around 112.000.000 words (or 5.397.000 sentences).
+It can take around 2 hours to run this script.
+
 """
 
 
-def write_data_to_csv(
-    counted_two_grams,
-    counted_three_grams,
-    counted_four_grams,
-    counted_five_grams,
-    counted_six_grams,
-):
+def write_data_to_csv(n_to_ngrams):
     """
     Writes the N-grams to CSV files. These CSV files are read from ntrans.py
     """
-    pass
+
+    pathlib.Path("ngrams").mkdir(exist_ok=True)
+
+    for n, collections_counter in n_to_ngrams.items():
+        file_path = f"./ngrams/{n}-grams.csv"
+
+        with open(file_path, mode="w") as write_data_file:
+            data_writer = csv.writer(write_data_file)
+
+            for ngram, count in collections_counter.most_common():
+                csv_row = [" ".join(ngram), str(count)]
+                data_writer.writerow(csv_row)
 
 
-def count_ngram_frequency(twograms, threegrams, fourgrams, fivegrams, sixgrams):
+def count_ngram_frequency(n_to_ngrams):
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
-    counted_two_grams = collections.Counter(twograms)
-    counted_three_grams = collections.Counter(threegrams)
-    counted_four_grams = collections.Counter(fourgrams)
-    counted_five_grams = collections.Counter(fivegrams)
-    counted_six_grams = collections.Counter(sixgrams)
 
-    write_data_to_csv(
-        counted_two_grams,
-        counted_three_grams,
-        counted_four_grams,
-        counted_five_grams,
-        counted_six_grams,
-    )
+    # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
+    write_data_to_csv({
+        n: collections.Counter(ngrams)
+        for n, ngrams in n_to_ngrams.items()
+    })
 
 
 def generate_ngrams():
@@ -61,18 +63,22 @@ def generate_ngrams():
     depending on the N-gram length.
     """
 
-    two_grams = []
-    three_grams = []
-    four_grams = []
-    five_grams = []
-    six_grams = []
+    n_to_ngrams = {
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+    }
 
     # Extracts <class 'nltk.corpus.reader.bnc.BNCSentence'> from BNC
     bnc_corpus = nltk.corpus.BNCCorpusReader(
         root="BNC/Texts/", fileids=r"[A-K]/\w*/\w*\.xml"
     )
 
-    for count, sentence in enumerate(bnc_corpus.sents()[:10000]):
+    # To work with a sample size of the BNC, add a range in sents().
+    # For example "for count, sentence in enumerate(bnc_corpus.sents()[:1000]):"
+    for count, sentence in enumerate(bnc_corpus.sents()):
 
         # Ignores any sentence that contains numbers
         if any(char.isdigit() for word in sentence for char in word):
@@ -84,7 +90,8 @@ def generate_ngrams():
             index for index, word in enumerate(sentence) if "'" in word
         ]
         for index in reversed(contraction_index):
-            sentence[index - 1] += sentence.pop(index)
+            if index != 0:
+                sentence[index - 1] += sentence.pop(index)
 
         # Removes all punctuation except apostrophies
         processed_sentence = [re.sub(r"[^\w']+", "", word.lower()) for word in sentence]
@@ -95,19 +102,12 @@ def generate_ngrams():
         # Determines sentence length for deciding what N-grams to create from the current sentence
         sentence_length = len(processed_sentence)
 
-        # Splits each sentence into N-grams and adds them to respective lists
-        if sentence_length >= 6:
-            six_grams.extend(nltk.ngrams(processed_sentence, 6))
-        if sentence_length >= 5:
-            five_grams.extend(nltk.ngrams(processed_sentence, 5))
-        if sentence_length >= 4:
-            four_grams.extend(nltk.ngrams(processed_sentence, 4))
-        if sentence_length >= 3:
-            three_grams.extend(nltk.ngrams(processed_sentence, 3))
-        if sentence_length >= 2:
-            two_grams.extend(nltk.ngrams(processed_sentence, 2))
+        # Splits each sentence into N-grams and adds them to respective value in n_to_ngrams
+        for n in n_to_ngrams.keys():
+            if sentence_length >= n:
+                n_to_ngrams[n].extend(nltk.ngrams(processed_sentence, n))
 
-    count_ngram_frequency(two_grams, three_grams, four_grams, five_grams, six_grams)
+    count_ngram_frequency(n_to_ngrams)
 
 
 generate_ngrams()
