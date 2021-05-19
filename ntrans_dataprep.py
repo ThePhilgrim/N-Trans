@@ -43,12 +43,10 @@ def count_ngram_frequency(n_to_ngrams):
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
-
-    for n in n_to_ngrams.keys():
-        n_to_ngrams[n] = collections.Counter(n_to_ngrams[n])
-
-    # print(n_to_ngrams[2])
-    write_data_to_csv(n_to_ngrams)
+    write_data_to_csv({
+        n: collections.Counter(ngrams)
+        for n, ngrams in n_to_ngrams.items()
+    })
 
 
 def generate_ngrams():
