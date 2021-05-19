@@ -32,7 +32,7 @@ def write_data_to_csv(n_to_ngrams):
         file_path = f"./ngrams/{n}-grams.csv"
 
         with open(file_path, mode="w") as write_data_file:
-            data_writer = csv.writer(write_data_file, delimiter=",")
+            data_writer = csv.writer(write_data_file)
 
             for ngram, count in counter.most_common():
                 csv_row = [" ".join(ngram), str(count)]
