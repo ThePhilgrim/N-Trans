@@ -1,107 +1,71 @@
-import nltk
+"""
+The usage of this script relies on the N-gram files in "./ngrams"
+
+These files are created through ntrans_dataprep.py
+"""
+
 import translatepy
-import re
-import collections
 import csv
-# import ssl
-
-
-def prepare_corpus_data(data_size=1000000):
-    # TODO: Put code that downloads BNC here
-
-    bnc_corpus = nltk.corpus.BNCCorpusReader(root='BNC/Texts/', fileids=r'[A-K]/\w*/\w*\.xml')
-
-    bnc_sents = []
-
-    # TODO:
-    # If user wants a smaller data set than the full corpus, it would be better
-    # to pick random sents() from bnc_corpus instead of for looping over the first
-    # X sents. If data_size = 10.000, pick 10.000 random sents from bnc_corpus
-
-    for count, sentence in enumerate(bnc_corpus.sents()):
-        string_sent = ' '.join(sentence)
-        bnc_sents.append(string_sent)
-        if count == 1000000:  # TODO: Change count == 10000 to "count == data_size"
-            print(count)
-            break
-        # TODO: Remake print(count) to progress bar in tkinter
-        if count % 1000 == 0:
-            print(count)
-
-    return ' '.join(bnc_sents)
 
 
 def create_csv_file(source_target_pairs, save_path=None):
+    """
+    Writes source/target pairs to a csv-file
+    """
+
     path = "/Users/Writing/Desktop/"  # TODO: Make path depend on user input and use "save_path"
     filename = "ntrans-glossary.csv"  # TODO: Make filename depend on user input
     full_path = path + filename
 
-    with open(full_path, mode='w') as write_ntrans_file:
-        data_writer = csv.writer(write_ntrans_file, delimiter=',')
+    with open(full_path, mode="w") as write_ntrans_file:
+        data_writer = csv.writer(write_ntrans_file, delimiter=",")
 
-        data_writer.writerow(('English', 'Swedish'))
+        data_writer.writerow(("English", "Swedish"))
         for source_target_pair in source_target_pairs:
             data_writer.writerow(source_target_pair)
 
     return print("N-Trans CSV Glossary has been successfully saved to " + full_path)
 
 
-def machine_translate_ngrams(list_of_ngrams, language=None):
+def machine_translate_ngrams(ngrams):
+    """
+    Translates each N-gram and appends the source/target pair to a list.
+    """
+    source_target_pairs = []
 
     translator = translatepy.Translator()
 
-    source_target_pairs = []
-
-    for enum_count, source_string in enumerate(list_of_ngrams, start=1):
-        print(f"Translating item {enum_count}/{len(list_of_ngrams)}")
-        translated_string = translator.translate(
-            source_string, "Swedish"
-        )  # TODO: Change to language variable
-        # print(source_string + " --> " + str(translated_string))
-        source_target_pairs.append((source_string, str(translated_string).lower()))
+    for key, value in ngrams.items():
+        for enum, source_ngram in enumerate(value, start=1):
+            print(f"Translating {key}-gram no. {enum} / {len(value)}")
+            target_ngram = str(
+                translator.translate(source_ngram, "Swedish")
+            ).lower()  # TODO: Target language should be variable-based
+            source_target_pairs.append((source_ngram, target_ngram))
 
     create_csv_file(source_target_pairs)
 
 
-def count_ngram_frequency(ngram_strings, desired_data_size):
-    x_most_common_ngrams = collections.Counter(ngram_strings).most_common(desired_data_size)
-    return [ngram[0] for ngram in x_most_common_ngrams]
-
-
-def create_ngrams(corpus_data, ngram_size, desired_data_size):
+def read_ngram_files(user_desired_ngrams=[2, 3, 4, 5, 6], data_size=500):
     """
-    Strips string from special characters, creates tuple n_grams, deletes tuples
-    with numbers, joins tuples into strings
+    Reads N-gram files depending on which N-grams the user wants to output.
+
+    Appends the N-grams to a dict with a size of data_size per N-gram (specified by user).
     """
 
-    # Removes punctuation and special characters from string.
-    text_without_punctuation = re.sub(r"[^\w']+", " ", corpus_data).lower()
+    ngrams = {n: [] for n in user_desired_ngrams}
 
-    # TODO: Make the .replaces more effective
-    text_without_punctuation = text_without_punctuation.replace(" '", "'")
-    text_without_punctuation = text_without_punctuation.replace(" n't", "n't")
+    for n in user_desired_ngrams:
+        with open(f"./ngrams/{n}-grams.csv") as ngram_file:
+            read_csv = csv.reader(ngram_file)
+            for enum, row in enumerate(read_csv):
+                if enum == data_size:
+                    break
+                ngrams[n].append(row[0])
 
-    # TODO: Put ngram function in for loop to include all N-grams that the user wants.
-    # TODO: Switch place of ngram creation and joining ngram_tuples into strings, since joining ngram_tuples takes a long time.
-    # Splits string into N-grams and adds them to tuple_list.
-    generated_ngram_tuples = nltk.ngrams(text_without_punctuation.split(), ngram_size)
-
-    # Joins tuples into strings, and deletes strings with numbers.
-    # TODO: Takes long time. Possible to make faster?
-    ngram_strings = []
-    print('Joining n-gram tuples to strings')
-    for generated_ngram_tuple in generated_ngram_tuples:
-        joined_tuple = " ".join(generated_ngram_tuple)
-        if not any(char.isdigit() for char in joined_tuple):
-            ngram_strings.append(joined_tuple)
-
-    count_ngram_frequency(ngram_strings, desired_data_size)
-    # # return machine_translate_ngrams(count_ngram_frequency(ngram_strings, desired_data_size))
+    machine_translate_ngrams(ngrams)
 
 
-"""
-CODE TESTING:
-"""
+# CODE TESTING:
 
-corpus_data = prepare_corpus_data()
-create_ngrams(corpus_data, 2, 100)
+read_ngram_files()
