@@ -5,9 +5,9 @@
 ## Introduction
 
 N-Trans creates a database of the X most common N-grams (https://en.wikipedia.org/wiki/N-gram) in the English language from
-the American Google Corpus (https://www.english-corpora.org/googlebooks/x.asp).
+the British National Corpus (https://www.english-corpora.org/bnc/).
 
-Thereafter, it uses Google Translate (https://translate.google.com/) to translate the N-grams into a chosen
+Thereafter, it uses various machine translation providers (read more: https://pypi.org/project/translatepy/) to translate the N-grams into a chosen
 target language, and creates a dictionary in CSV format.
 
 The purpose of N-Trans is to aid translators by enhancing workflow in their CAT tool of choice.
@@ -21,6 +21,7 @@ Thank you for your interest in using N-Trans.
 Please note that N-Trans is still under development, and is not yet in a usable state.
 A certain understanding of programming is required to use N-Trans at this stage.
 
+Please return to this page regularly to stay updated with the progress of development.
 
 
 ## For Developers
