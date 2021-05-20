@@ -1,13 +1,11 @@
-import translatepy
-import csv
-
 """
-DEVELOPER INFO:
-
 The usage of this script relies on the N-gram files in "./ngrams"
 
 These files are created through ntrans_dataprep.py
 """
+
+import translatepy
+import csv
 
 
 def create_csv_file(source_target_pairs, save_path=None):
@@ -37,9 +35,9 @@ def machine_translate_ngrams(ngrams):
 
     translator = translatepy.Translator()
 
-    for n in ngrams.keys():
-        for enum, source_ngram in enumerate(ngrams[n], start=1):
-            print(f"Translating {n}-gram no. {enum} / {len(ngrams[n])}")
+    for key, value in ngrams.items():
+        for enum, source_ngram in enumerate(value, start=1):
+            print(f"Translating {key}-gram no. {enum} / {len(value)}")
             target_ngram = str(
                 translator.translate(source_ngram, "Swedish")
             ).lower()  # TODO: Target language should be variable-based
