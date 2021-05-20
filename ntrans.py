@@ -68,8 +68,6 @@ def read_ngram_files(user_desired_ngrams=[2, 3, 4, 5, 6], data_size=500):
     machine_translate_ngrams(ngrams)
 
 
-"""
-CODE TESTING:
-"""
+# CODE TESTING:
 
 read_ngram_files()
