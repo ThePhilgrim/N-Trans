@@ -55,7 +55,7 @@ def read_ngram_files(user_desired_ngrams=[2, 3, 4, 5, 6], data_size=500):
     Appends the N-grams to a dict with a size of data_size per N-gram (specified by user).
     """
 
-    ngrams = {2: [], 3: [], 4: [], 5: [], 6: []}
+    ngrams = {n: [] for n in user_desired_ngrams}
 
     for n in user_desired_ngrams:
         with open(f"./ngrams/{n}-grams.csv") as ngram_file:
