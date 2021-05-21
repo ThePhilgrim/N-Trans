@@ -1,12 +1,4 @@
-import csv
-import collections
-import re
-import nltk
-import pathlib
-
 """
-DEVELOPER INFO:
-
 This script requires BNC (British National Corpus) to be downloaded to the local
 system.
 
@@ -19,6 +11,12 @@ NOTE: The BNC contains around 112.000.000 words (or 5.397.000 sentences).
 It can take around 2 hours to run this script.
 
 """
+
+import csv
+import collections
+import re
+import nltk
+import pathlib
 
 
 def write_data_to_csv(n_to_ngrams):
@@ -50,16 +48,34 @@ def count_ngram_frequency(n_to_ngrams):
     )
 
 
-def generate_ngrams():
+def format_corpus_sents(sentence):
+    """
+    Reformats spaces in contracted words. Contracted words in
+    <class 'nltk.corpus.reader.bnc.BNCSentence'> are formatted "it 's" and "ca n't"
+
+    Removes all punctuation except apostrophies, and removes the empty strings left from the deleted
+    apostrophies
+    """
+
+    sentence = sentence.copy()
+
+    contraction_index = [index for index, word in enumerate(sentence) if "'" in word]
+    for index in reversed(contraction_index):
+        if index != 0:
+            sentence[index - 1] += sentence.pop(index)
+
+    processed_sentence = [re.sub(r"[^\w']+", "", word.lower()) for word in sentence]
+
+    return list(filter(None, processed_sentence))
+
+
+def generate_ngrams_from_corpus():
     """
     Extracts all sentences from the BNC in their raw format.
     Any sentence containing a number will be ignored.
 
-    The remaining sencentes are processed by removing all punctuation &
-    re-formatting contracted words, such as "can't" or "shouldn't".
-
-    The sentences are then split into N-grams and added to lists,
-    depending on the N-gram length.
+    The sentences are formatted before they are split into N-grams and added to lists, depending on
+    the N-gram length.
     """
 
     n_to_ngrams = {
@@ -83,20 +99,7 @@ def generate_ngrams():
         if any(char.isdigit() for word in sentence for char in word):
             continue
 
-        # Removes spaces in contracted words. Contracted words in
-        # <class 'nltk.corpus.reader.bnc.BNCSentence'> are formatted "it 's" and "ca n't"
-        contraction_index = [
-            index for index, word in enumerate(sentence) if "'" in word
-        ]
-        for index in reversed(contraction_index):
-            if index != 0:
-                sentence[index - 1] += sentence.pop(index)
-
-        # Removes all punctuation except apostrophies
-        processed_sentence = [re.sub(r"[^\w']+", "", word.lower()) for word in sentence]
-
-        # Removes empty strings left from removed punctuation
-        processed_sentence = list(filter(None, processed_sentence))
+        processed_sentence = format_corpus_sents(sentence)
 
         # Determines sentence length for deciding what N-grams to create from the current sentence
         sentence_length = len(processed_sentence)
@@ -109,4 +112,4 @@ def generate_ngrams():
     count_ngram_frequency(n_to_ngrams)
 
 
-generate_ngrams()
+generate_ngrams_from_corpus()
