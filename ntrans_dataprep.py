@@ -48,13 +48,33 @@ def count_ngram_frequency(n_to_ngrams):
     )
 
 
-def generate_ngrams():
+def format_corpus_sents(sentence):
+    """
+    Reformats spaces in contracted words. Contracted words in
+    <class 'nltk.corpus.reader.bnc.BNCSentence'> are formatted "it 's" and "ca n't"
+
+    Removes all punctuation except apostrophies, and removes the empty strings left from the deleted
+    apostrophies
+    """
+
+    contraction_index = [
+        index for index, word in enumerate(sentence) if "'" in word
+    ]
+    for index in reversed(contraction_index):
+        if index != 0:
+            sentence[index - 1] += sentence.pop(index)
+
+    processed_sentence = [re.sub(r"[^\w']+", "", word.lower()) for word in sentence]
+
+    return list(filter(None, processed_sentence))
+
+
+def generate_ngrams_from_corpus():
     """
     Extracts all sentences from the BNC in their raw format.
     Any sentence containing a number will be ignored.
 
-    The remaining sencentes are processed by removing all punctuation &
-    re-formatting contracted words, such as "can't" or "shouldn't".
+    The sentences are formatted in format_corpus_sents()
 
     The sentences are then split into N-grams and added to lists,
     depending on the N-gram length.
@@ -75,26 +95,13 @@ def generate_ngrams():
 
     # To work with a sample size of the BNC, add a range in sents().
     # For example "for count, sentence in enumerate(bnc_corpus.sents()[:1000]):"
-    for count, sentence in enumerate(bnc_corpus.sents()):
+    for count, sentence in enumerate(bnc_corpus.sents()[:100]):
 
         # Ignores any sentence that contains numbers
         if any(char.isdigit() for word in sentence for char in word):
             continue
 
-        # Removes spaces in contracted words. Contracted words in
-        # <class 'nltk.corpus.reader.bnc.BNCSentence'> are formatted "it 's" and "ca n't"
-        contraction_index = [
-            index for index, word in enumerate(sentence) if "'" in word
-        ]
-        for index in reversed(contraction_index):
-            if index != 0:
-                sentence[index - 1] += sentence.pop(index)
-
-        # Removes all punctuation except apostrophies
-        processed_sentence = [re.sub(r"[^\w']+", "", word.lower()) for word in sentence]
-
-        # Removes empty strings left from removed punctuation
-        processed_sentence = list(filter(None, processed_sentence))
+        processed_sentence = format_corpus_sents(sentence)
 
         # Determines sentence length for deciding what N-grams to create from the current sentence
         sentence_length = len(processed_sentence)
@@ -107,4 +114,4 @@ def generate_ngrams():
     count_ngram_frequency(n_to_ngrams)
 
 
-generate_ngrams()
+generate_ngrams_from_corpus()
