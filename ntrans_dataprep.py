@@ -1,12 +1,4 @@
-import csv
-import collections
-import re
-import nltk
-import pathlib
-
 """
-DEVELOPER INFO:
-
 This script requires BNC (British National Corpus) to be downloaded to the local
 system.
 
@@ -19,6 +11,12 @@ NOTE: The BNC contains around 112.000.000 words (or 5.397.000 sentences).
 It can take around 2 hours to run this script.
 
 """
+
+import csv
+import collections
+import re
+import nltk
+import pathlib
 
 
 def write_data_to_csv(n_to_ngrams):
