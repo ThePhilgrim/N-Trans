@@ -57,9 +57,7 @@ def format_corpus_sents(sentence):
     apostrophies
     """
 
-    contraction_index = [
-        index for index, word in enumerate(sentence) if "'" in word
-    ]
+    contraction_index = [index for index, word in enumerate(sentence) if "'" in word]
     for index in reversed(contraction_index):
         if index != 0:
             sentence[index - 1] += sentence.pop(index)
