@@ -57,6 +57,8 @@ def format_corpus_sents(sentence):
     apostrophies
     """
 
+    sentence = sentence.copy()
+
     contraction_index = [index for index, word in enumerate(sentence) if "'" in word]
     for index in reversed(contraction_index):
         if index != 0:
@@ -72,10 +74,8 @@ def generate_ngrams_from_corpus():
     Extracts all sentences from the BNC in their raw format.
     Any sentence containing a number will be ignored.
 
-    The sentences are formatted in format_corpus_sents()
-
-    The sentences are then split into N-grams and added to lists,
-    depending on the N-gram length.
+    The sentences are formatted before they are split into N-grams and added to lists, depending on
+    the N-gram length.
     """
 
     n_to_ngrams = {
