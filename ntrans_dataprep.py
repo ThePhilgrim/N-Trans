@@ -19,15 +19,16 @@ import nltk
 import pathlib
 
 
-def write_data_to_csv(n_to_ngrams):
+def write_data_to_csv(n_to_ngrams, data_chunk):
     """
     Writes the N-grams to CSV files. These CSV files are read from ntrans.py
     """
+    print('IN WRITING FUNC')
 
     pathlib.Path("ngrams").mkdir(exist_ok=True)
 
     for n, collections_counter in n_to_ngrams.items():
-        file_path = f"./ngrams/{n}-grams.csv"
+        file_path = f"./ngrams/chunk{data_chunk}_{n}-grams.csv"
 
         with open(file_path, mode="w") as write_data_file:
             data_writer = csv.writer(write_data_file)
@@ -37,14 +38,14 @@ def write_data_to_csv(n_to_ngrams):
                 data_writer.writerow(csv_row)
 
 
-def count_ngram_frequency(n_to_ngrams):
+def count_ngram_frequency(n_to_ngrams, data_chunk):
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
 
     # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
     write_data_to_csv(
-        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}
+        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}, data_chunk
     )
 
 
@@ -77,6 +78,7 @@ def generate_ngrams_from_corpus():
     The sentences are formatted before they are split into N-grams and added to lists, depending on
     the N-gram length.
     """
+    # TODO: Update Docstring to explain csv split process
 
     n_to_ngrams = {
         2: [],
@@ -91,9 +93,23 @@ def generate_ngrams_from_corpus():
         root="BNC/Texts/", fileids=r"[A-K]/\w*/\w*\.xml"
     )
 
+    # Tells the program how to name the generated csv-files when splitting data into several
+    # files.
+    data_chunk = 1
+
     # To work with a sample size of the BNC, add a range in sents().
     # For example "for count, sentence in enumerate(bnc_corpus.sents()[:1000]):"
     for count, sentence in enumerate(bnc_corpus.sents()):
+        if count % 1000 == 0:
+            print(count)
+
+        if count != 0 and count % 500000 == 0:
+            print('CALLING THE PROCESS')
+            count_ngram_frequency(n_to_ngrams, data_chunk)
+            data_chunk += 1
+
+            for n in n_to_ngrams:
+                n_to_ngrams[n].clear()
 
         # Ignores any sentence that contains numbers
         if any(char.isdigit() for word in sentence for char in word):
@@ -108,8 +124,6 @@ def generate_ngrams_from_corpus():
         for n in n_to_ngrams.keys():
             if sentence_length >= n:
                 n_to_ngrams[n].extend(nltk.ngrams(processed_sentence, n))
-
-    count_ngram_frequency(n_to_ngrams)
 
 
 generate_ngrams_from_corpus()
