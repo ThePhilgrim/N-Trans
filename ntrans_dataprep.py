@@ -95,7 +95,7 @@ def generate_ngrams_from_corpus():
 
     # To work with a sample size of the BNC, add a range in sents().
     # For example "for count, sentence in enumerate(bnc_corpus.sents()[:1000]):"
-    for count, sentence in enumerate(bnc_corpus.sents()[:100]):
+    for count, sentence in enumerate(bnc_corpus.sents()):
 
         # Ignores any sentence that contains numbers
         if any(char.isdigit() for word in sentence for char in word):
