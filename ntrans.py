@@ -4,7 +4,7 @@ The usage of this script relies on the N-gram files in "./ngrams"
 These files are created through ntrans_dataprep.py
 """
 
-import translatepy
+import translatepy  # type: ignore
 import csv
 
 

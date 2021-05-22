@@ -17,7 +17,7 @@ The script generates 237M N-grams.
 import csv
 import collections
 import re
-import nltk
+import nltk  # type: ignore
 import pathlib
 from datetime import datetime
 
