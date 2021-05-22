@@ -7,8 +7,10 @@ http://www.ota.ox.ac.uk/desc/2554
 
 Unzip BNC to the working directory, and rename the folder `BNC`.
 
-NOTE: The BNC contains around 112.000.000 words (or 5.397.000 sentences).
-It can take around 2 hours to run this script.
+NOTE: The BNC contains around 112M words (or 6M+ sentences).
+It can take around 1,5 hours to run this script.
+
+The script generates 237M N-grams.
 
 """
 
@@ -17,17 +19,29 @@ import collections
 import re
 import nltk
 import pathlib
+from datetime import datetime
 
 
-def write_data_to_csv(n_to_ngrams):
+def write_data_to_csv(n_to_ngrams, chunk_number):
     """
-    Writes the N-grams to CSV files. These CSV files are read from ntrans.py
+    Writes the N-grams to CSV files in chunks of 300K sentences.
+
     """
 
     pathlib.Path("ngrams").mkdir(exist_ok=True)
 
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+
+    print(
+        "Writing data chunk #"
+        + str(chunk_number)
+        + " to csv – Current time: "
+        + current_time
+    )
+
     for n, collections_counter in n_to_ngrams.items():
-        file_path = f"./ngrams/{n}-grams.csv"
+        file_path = f"./ngrams/chunk{chunk_number}_{n}-grams.csv"
 
         with open(file_path, mode="w") as write_data_file:
             data_writer = csv.writer(write_data_file)
@@ -43,18 +57,16 @@ def count_ngram_frequency(n_to_ngrams):
     """
 
     # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
-    write_data_to_csv(
-        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}
-    )
+    return {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}
 
 
 def format_corpus_sents(sentence):
     """
     Reformats spaces in contracted words. Contracted words in
-    <class 'nltk.corpus.reader.bnc.BNCSentence'> are formatted "it 's" and "ca n't"
+    <class 'nltk.corpus.reader.bnc.BNCSentence'> are formatted "it 's" and "ca n't".
 
     Removes all punctuation except apostrophies, and removes the empty strings left from the deleted
-    apostrophies
+    apostrophies.
     """
 
     sentence = sentence.copy()
@@ -77,6 +89,7 @@ def generate_ngrams_from_corpus():
     The sentences are formatted before they are split into N-grams and added to lists, depending on
     the N-gram length.
     """
+    # TODO: Update Docstring to explain csv split process
 
     n_to_ngrams = {
         2: [],
@@ -91,9 +104,21 @@ def generate_ngrams_from_corpus():
         root="BNC/Texts/", fileids=r"[A-K]/\w*/\w*\.xml"
     )
 
+    chunk_number = 1
+
     # To work with a sample size of the BNC, add a range in sents().
     # For example "for count, sentence in enumerate(bnc_corpus.sents()[:1000]):"
     for count, sentence in enumerate(bnc_corpus.sents()):
+        if count % 10000 == 0:
+            print(count)
+
+        if count != 0 and count % 300000 == 0:
+            count_ngram_frequency(n_to_ngrams, chunk_number)
+            chunk_number += 1
+
+            # Avoids filling up RAM
+            for n in n_to_ngrams:
+                n_to_ngrams[n].clear()
 
         # Ignores any sentence that contains numbers
         if any(char.isdigit() for word in sentence for char in word):
@@ -109,7 +134,7 @@ def generate_ngrams_from_corpus():
             if sentence_length >= n:
                 n_to_ngrams[n].extend(nltk.ngrams(processed_sentence, n))
 
-    count_ngram_frequency(n_to_ngrams)
+    write_data_to_csv(count_ngram_frequency(n_to_ngrams), chunk_number)
 
 
 generate_ngrams_from_corpus()
