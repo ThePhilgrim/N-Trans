@@ -31,9 +31,7 @@ N-Trans is split into three phases.
 1) In `ntrans_dataprep.py`, sentences from the BNC are processed and, split into N-grams, and written
 to .csv files in chunks of 300K sentences.
 
-The script generates a total of 236.937.946 N-grams.
-
-2) In `ntrans_compile.py`, the frequency of each N-gram is counted with `collections.Counter`. The 50K
+2) In `ntrans_combine.py`, the frequency of each N-gram is counted with `collections.Counter`. The 50K
 most frequent N-grams are thereafter written to a new .csv file. One file is created for each N-gram
 (2-grams, 3-grams, etc.)
 
@@ -66,8 +64,3 @@ This project uses Black to format the code. Please use Black before creating a P
 To use Black:
 - MAC OS:
   `black file.py`
-
-### Module Docs
-
-NLTK: https://www.nltk.org/
-Translatepy: https://github.com/Animenosekai/translate
