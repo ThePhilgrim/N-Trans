@@ -52,7 +52,7 @@ To activate a virtual environment:
 
 ### Install Dependencies
 
-To install the dependencies needed to develop & test N-Trans, use:
+To install the dependencies needed to develop & test N-Trans, run inside the virtualenv:
 
 - MAC OS:
   `python3 -m pip install -r requirements.txt`
