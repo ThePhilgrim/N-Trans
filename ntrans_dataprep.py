@@ -51,7 +51,7 @@ def write_data_to_csv(n_to_ngrams, chunk_number):
                 data_writer.writerow(csv_row)
 
 
-def count_ngram_frequency(n_to_ngrams, chunk_number):
+def count_ngram_frequency(n_to_ngrams):
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
@@ -113,7 +113,7 @@ def generate_ngrams_from_corpus():
             print(count)
 
         if count != 0 and count % 300000 == 0:
-            count_ngram_frequency(n_to_ngrams, chunk_number)
+            write_data_to_csv(count_ngram_frequency(n_to_ngrams), chunk_number)
             chunk_number += 1
 
             # Avoids filling up RAM
