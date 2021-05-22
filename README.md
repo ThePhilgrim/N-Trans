@@ -45,10 +45,14 @@ It is recommended to work on N-Trans in a virtual environment.
 To set up a virtual environment:
 - MAC OS:
   `python3 -m venv env`
+- Windows
+  `py -m venv env`
 
 To activate a virtual environment:
 - MAC OS:
   `source env/bin/activate`
+- Windows:
+  `env\Scripts\activate`
 
 ### Install Dependencies
 
@@ -56,11 +60,12 @@ To install the dependencies needed to develop & test N-Trans, run inside the vir
 
 - MAC OS:
   `python3 -m pip install -r requirements.txt`
+- Windows:
+  `py -m pip install -r requirements.txt`
 
 ### Formatting
 
 This project uses Black to format the code. Please use Black before creating a PR.
 
 To use Black:
-- MAC OS:
-  `black file.py`
+`black file.py`
