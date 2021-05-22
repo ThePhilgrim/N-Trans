@@ -28,7 +28,7 @@ def write_data_to_csv(n_to_ngrams, chunk_number):
 
     """
 
-    pathlib.Path("ngrams").mkdir(exist_ok=True)
+    pathlib.Path("ngram_data_chunks").mkdir(exist_ok=True)
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
@@ -41,7 +41,7 @@ def write_data_to_csv(n_to_ngrams, chunk_number):
     )
 
     for n, collections_counter in n_to_ngrams.items():
-        file_path = f"./ngrams/chunk{chunk_number}_{n}-grams.csv"
+        file_path = f"./ngram_data_chunks/chunk{chunk_number}_{n}-grams.csv"
 
         with open(file_path, mode="w") as write_data_file:
             data_writer = csv.writer(write_data_file)
