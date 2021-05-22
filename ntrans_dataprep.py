@@ -115,8 +115,6 @@ def generate_ngrams_from_corpus():
         if count % 10000 == 0:
             print(count)
 
-        # Splits up the proecssing of sentences into chunks of 300K, and clears the dict where
-        # the data is temporarily stored.
         if count != 0 and count % 300000 == 0:
             count_ngram_frequency(n_to_ngrams, chunk_number)
             chunk_number += 1
