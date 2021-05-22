@@ -51,16 +51,13 @@ def write_data_to_csv(n_to_ngrams, chunk_number):
                 data_writer.writerow(csv_row)
 
 
-def count_ngram_frequency(n_to_ngrams, chunk_number):
+def count_ngram_frequency(n_to_ngrams):
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
 
     # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
-    write_data_to_csv(
-        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()},
-        chunk_number,
-    )
+    return {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}
 
 
 def format_corpus_sents(sentence):
@@ -137,7 +134,7 @@ def generate_ngrams_from_corpus():
             if sentence_length >= n:
                 n_to_ngrams[n].extend(nltk.ngrams(processed_sentence, n))
 
-    count_ngram_frequency(n_to_ngrams, chunk_number)
+    write_data_to_csv(count_ngram_frequency(n_to_ngrams), chunk_number)
 
 
 generate_ngrams_from_corpus()
