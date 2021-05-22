@@ -31,9 +31,14 @@ def write_data_to_csv(n_to_ngrams, data_chunk):
     pathlib.Path("ngrams").mkdir(exist_ok=True)
 
     now = datetime.now()
-    current_time = now.strftime('%H:%M:%S')
+    current_time = now.strftime("%H:%M:%S")
 
-    print("Writing data chunk #" + str(data_chunk) + " to csv – Current time: " + current_time)
+    print(
+        "Writing data chunk #"
+        + str(data_chunk)
+        + " to csv – Current time: "
+        + current_time
+    )
 
     for n, collections_counter in n_to_ngrams.items():
         file_path = f"./ngrams/chunk{data_chunk}_{n}-grams.csv"
@@ -53,7 +58,8 @@ def count_ngram_frequency(n_to_ngrams, data_chunk):
 
     # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
     write_data_to_csv(
-        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}, data_chunk
+        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()},
+        data_chunk,
     )
 
 
