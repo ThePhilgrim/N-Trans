@@ -14,15 +14,21 @@ The script generates 237M N-grams.
 
 """
 
+from __future__ import annotations
+
 import csv
 import collections
 import re
 import nltk  # type: ignore
 import pathlib
 from datetime import datetime
+from typing import List, Dict, Tuple
 
 
-def write_data_to_csv(n_to_ngrams, chunk_number):
+NGram = Tuple[str, ...]
+
+
+def write_data_to_csv(n_to_ngrams: Dict[int, collections.Counter[NGram]], chunk_number: int) -> None:
     """
     Writes the N-grams to CSV files in chunks of 300K sentences.
 
@@ -51,7 +57,7 @@ def write_data_to_csv(n_to_ngrams, chunk_number):
                 data_writer.writerow(csv_row)
 
 
-def count_ngram_frequency(n_to_ngrams, chunk_number):
+def count_ngram_frequency(n_to_ngrams: Dict[int, List[NGram]]) -> Dict[int, collections.Counter[NGram]]:
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
@@ -60,7 +66,7 @@ def count_ngram_frequency(n_to_ngrams, chunk_number):
     return {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}
 
 
-def format_corpus_sents(sentence):
+def format_corpus_sents(sentence: List[str]) -> List[str]:
     """
     Reformats spaces in contracted words. Contracted words in
     <class 'nltk.corpus.reader.bnc.BNCSentence'> are formatted "it 's" and "ca n't".
@@ -81,7 +87,7 @@ def format_corpus_sents(sentence):
     return list(filter(None, processed_sentence))
 
 
-def generate_ngrams_from_corpus():
+def generate_ngrams_from_corpus() -> None:
     """
     Extracts all sentences from the BNC in their raw format.
     Any sentence containing a number will be ignored.
@@ -91,7 +97,7 @@ def generate_ngrams_from_corpus():
     """
     # TODO: Update Docstring to explain csv split process
 
-    n_to_ngrams = {
+    n_to_ngrams: Dict[int, List[NGram]] = {
         2: [],
         3: [],
         4: [],
@@ -113,7 +119,7 @@ def generate_ngrams_from_corpus():
             print(count)
 
         if count != 0 and count % 300000 == 0:
-            count_ngram_frequency(n_to_ngrams, chunk_number)
+            count_ngram_frequency(n_to_ngrams)
             chunk_number += 1
 
             # Avoids filling up RAM
