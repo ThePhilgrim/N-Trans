@@ -7,10 +7,10 @@ http://www.ota.ox.ac.uk/desc/2554
 
 Unzip BNC to the working directory, and rename the folder `BNC`.
 
-NOTE: The BNC contains around 112.000.000 words (or 6.020.000+ sentences).
+NOTE: The BNC contains around 112M words (or 6M+ sentences).
 It can take around 1,5 hours to run this script.
 
-The script generates 236.937.946 N-grams.
+The script generates 237M N-grams.
 
 """
 
@@ -22,7 +22,7 @@ import pathlib
 from datetime import datetime
 
 
-def write_data_to_csv(n_to_ngrams, data_chunk):
+def write_data_to_csv(n_to_ngrams, chunk_number):
     """
     Writes the N-grams to CSV files in chunks of 300K sentences.
 
@@ -35,13 +35,13 @@ def write_data_to_csv(n_to_ngrams, data_chunk):
 
     print(
         "Writing data chunk #"
-        + str(data_chunk)
+        + str(chunk_number)
         + " to csv – Current time: "
         + current_time
     )
 
     for n, collections_counter in n_to_ngrams.items():
-        file_path = f"./ngrams/chunk{data_chunk}_{n}-grams.csv"
+        file_path = f"./ngrams/chunk{chunk_number}_{n}-grams.csv"
 
         with open(file_path, mode="w") as write_data_file:
             data_writer = csv.writer(write_data_file)
@@ -57,10 +57,7 @@ def count_ngram_frequency(n_to_ngrams, data_chunk):
     """
 
     # Example output: "2: Counter({('of', 'the'): 64, ('in', 'the'): 48, ('gift', 'aid'): 27..."
-    write_data_to_csv(
-        {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()},
-        data_chunk,
-    )
+    return {n: collections.Counter(ngrams) for n, ngrams in n_to_ngrams.items()}
 
 
 def format_corpus_sents(sentence):
@@ -107,9 +104,7 @@ def generate_ngrams_from_corpus():
         root="BNC/Texts/", fileids=r"[A-K]/\w*/\w*\.xml"
     )
 
-    # Tells the program how to name the generated csv-files when splitting data into several
-    # files.
-    data_chunk = 1
+    chunk_number = 1
 
     # To work with a sample size of the BNC, add a range in sents().
     # For example "for count, sentence in enumerate(bnc_corpus.sents()[:1000]):"
@@ -117,12 +112,11 @@ def generate_ngrams_from_corpus():
         if count % 10000 == 0:
             print(count)
 
-        # Splits up the proecssing of sentences into chunks of 300K, and clears the dict where
-        # the data is temporarily stored.
         if count != 0 and count % 300000 == 0:
-            count_ngram_frequency(n_to_ngrams, data_chunk)
-            data_chunk += 1
+            count_ngram_frequency(n_to_ngrams, chunk_number)
+            chunk_number += 1
 
+            # Avoids filling up RAM
             for n in n_to_ngrams:
                 n_to_ngrams[n].clear()
 
@@ -140,7 +134,7 @@ def generate_ngrams_from_corpus():
             if sentence_length >= n:
                 n_to_ngrams[n].extend(nltk.ngrams(processed_sentence, n))
 
-    count_ngram_frequency(n_to_ngrams, data_chunk)
+    write_data_to_csv(count_ngram_frequency(n_to_ngrams), chunk_number)
 
 
 generate_ngrams_from_corpus()
