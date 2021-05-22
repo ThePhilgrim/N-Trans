@@ -51,7 +51,7 @@ def write_data_to_csv(n_to_ngrams, chunk_number):
                 data_writer.writerow(csv_row)
 
 
-def count_ngram_frequency(n_to_ngrams, data_chunk):
+def count_ngram_frequency(n_to_ngrams, chunk_number):
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
