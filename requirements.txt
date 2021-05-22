@@ -4,3 +4,4 @@ nltk
 translatepy
 
 black
+mypy
