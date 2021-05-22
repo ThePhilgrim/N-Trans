@@ -1,0 +1,6 @@
+# Python dependencies for developing and testing N-Trans.
+
+nltk
+translatepy
+
+black
