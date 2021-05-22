@@ -123,7 +123,7 @@ def generate_ngrams_from_corpus() -> None:
             print(count)
 
         if count != 0 and count % 300000 == 0:
-            count_ngram_frequency(n_to_ngrams)
+            write_data_to_csv(count_ngram_frequency(n_to_ngrams), chunk_number)
             chunk_number += 1
 
             # Avoids filling up RAM
