@@ -28,7 +28,9 @@ from typing import List, Dict, Tuple
 NGram = Tuple[str, ...]
 
 
-def write_data_to_csv(n_to_ngrams: Dict[int, collections.Counter[NGram]], chunk_number: int) -> None:
+def write_data_to_csv(
+    n_to_ngrams: Dict[int, collections.Counter[NGram]], chunk_number: int
+) -> None:
     """
     Writes the N-grams to CSV files in chunks of 300K sentences.
 
@@ -57,7 +59,9 @@ def write_data_to_csv(n_to_ngrams: Dict[int, collections.Counter[NGram]], chunk_
                 data_writer.writerow(csv_row)
 
 
-def count_ngram_frequency(n_to_ngrams: Dict[int, List[NGram]]) -> Dict[int, collections.Counter[NGram]]:
+def count_ngram_frequency(
+    n_to_ngrams: Dict[int, List[NGram]]
+) -> Dict[int, collections.Counter[NGram]]:
     """
     Counts the frequency of each N-gram to distinguish the most common ones.
     """
