@@ -26,6 +26,20 @@ Please return to this page regularly to stay updated with the progress of develo
 
 ## For Developers
 
+N-Trans is split into three phases.
+
+1) In `ntrans_dataprep.py`, sentences from the BNC are processed and, split into N-grams, and written
+to .csv files in chunks of 300K sentences.
+
+2) In `ntrans_combine.py`, the frequency of each N-gram is counted with `collections.Counter`. The 50K
+most frequent N-grams are thereafter written to a new .csv file. One file is created for each N-gram
+(2-grams, 3-grams, etc.)
+
+3) `ntrans.py` is the main program which the end user is exposed to. Here, the X most frequent N-grams
+will be machine translated to a chosen target language, and the source-target pair is written to a .csv file.
+
+### Development
+
 It is recommended to work on N-Trans in a virtual environment.
 
 To set up a virtual environment:
@@ -36,52 +50,17 @@ To activate a virtual environment:
 - MAC OS:
   `source env/bin/activate`
 
+### Install Dependencies
 
+To install the dependencies needed to develop & test N-Trans, run inside the virtualenv:
 
-### Libraries
-
-
-#### NLTK (Docs: https://www.nltk.org/)
-
-To install NLTK:
 - MAC OS:
-  `python3 -m pip install nltk`
+  `python3 -m pip install -r requirements.txt`
 
-NLTK is used to process the data and create N-grams from it.
+### Formatting
 
-
-#### Re (Docs: https://docs.python.org/3/library/re.html)
-
-Re is used to remove punctuation & special characters from the downloaded data
-
-#### collections.Counter (Docs: https://docs.python.org/3/library/collections.html)
-
-collections.Counter is used to count the frequency of each N-gram to distinguish the most common ones.
-
-#### translatepy (Docs: https://github.com/Animenosekai/translate)
-
-To install translatepy:
-- MAC OS:
-  `python3 -m pip install translatepy`
-
-Translatepy is used to, with the help of several machine translation APIs, translate the X most common N-grams.
-
-
-#### CSV (Docs: https://docs.python.org/3/library/csv.html)
-
-CSV is used to create the N-Trans glossary file.
-
-
-### Tools
-
-
-#### Black (Docs: https://pypi.org/project/black/)
 This project uses Black to format the code. Please use Black before creating a PR.
-
-To install Black:
-- MAC OS:
-  `python3 -m pip install black`
 
 To use Black:
 - MAC OS:
-  `black ntrans.py`
+  `black file.py`
