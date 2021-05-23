@@ -50,7 +50,9 @@ def machine_translate_ngrams(ngrams: Dict[int, List[str]]) -> None:
     create_csv_file(source_target_pairs)
 
 
-def read_ngram_files(user_desired_ngrams: List[int] = [2, 3, 4, 5, 6], data_size: int = 500) -> None:
+def read_ngram_files(
+    user_desired_ngrams: List[int] = [2, 3, 4, 5, 6], data_size: int = 500
+) -> None:
     """
     Reads N-gram files depending on which N-grams the user wants to output.
 
