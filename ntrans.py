@@ -4,11 +4,15 @@ The usage of this script relies on the N-gram files in "./ngrams"
 These files are created through ntrans_dataprep.py
 """
 
-import translatepy
+import translatepy  # type: ignore
 import csv
+from typing import List, Dict, Tuple
 
 
-def create_csv_file(source_target_pairs, save_path=None):
+SourceTarget = Tuple[str, str]
+
+
+def create_csv_file(source_target_pairs: List[SourceTarget], save_path=None) -> None:
     """
     Writes source/target pairs to a csv-file
     """
@@ -27,11 +31,11 @@ def create_csv_file(source_target_pairs, save_path=None):
     return print("N-Trans CSV Glossary has been successfully saved to " + full_path)
 
 
-def machine_translate_ngrams(ngrams):
+def machine_translate_ngrams(ngrams: Dict[int, List[str]]) -> None:
     """
     Translates each N-gram and appends the source/target pair to a list.
     """
-    source_target_pairs = []
+    source_target_pairs: List[SourceTarget] = []
 
     translator = translatepy.Translator()
 
@@ -46,14 +50,16 @@ def machine_translate_ngrams(ngrams):
     create_csv_file(source_target_pairs)
 
 
-def read_ngram_files(user_desired_ngrams=[2, 3, 4, 5, 6], data_size=500):
+def read_ngram_files(
+    user_desired_ngrams: List[int] = [2, 3, 4, 5, 6], data_size: int = 500
+) -> None:
     """
     Reads N-gram files depending on which N-grams the user wants to output.
 
     Appends the N-grams to a dict with a size of data_size per N-gram (specified by user).
     """
 
-    ngrams = {n: [] for n in user_desired_ngrams}
+    ngrams: Dict[int, List[str]] = {n: [] for n in user_desired_ngrams}
 
     for n in user_desired_ngrams:
         with open(f"./ngrams/{n}-grams.csv") as ngram_file:

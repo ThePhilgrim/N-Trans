@@ -12,3 +12,14 @@ jobs:
         python3 -m pip install black
     - run: |
         python3 -m black --check ntrans.py ntrans_dataprep.py
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: "3.9"
+    - run: |
+        python3 -m pip install mypy
+    - run: |
+        python3 -m mypy ntrans.py ntrans_dataprep.py
