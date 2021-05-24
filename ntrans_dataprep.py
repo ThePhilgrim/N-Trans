@@ -25,7 +25,6 @@ from datetime import datetime
 from typing import List, Dict, Tuple
 
 
-# Type hinting
 NGram = Tuple[str, ...]
 
 
