@@ -130,16 +130,13 @@ def generate_ngrams_from_corpus() -> None:
             for n in n_to_ngrams:
                 n_to_ngrams[n].clear()
 
-        # Ignores any sentence that contains numbers
         if any(char.isdigit() for word in sentence for char in word):
             continue
 
         processed_sentence = format_corpus_sents(sentence)
 
-        # Determines sentence length for deciding what N-grams to create from the current sentence
         sentence_length = len(processed_sentence)
 
-        # Splits each sentence into N-grams and adds them to respective value in n_to_ngrams
         for n in n_to_ngrams.keys():
             if sentence_length >= n:
                 n_to_ngrams[n].extend(nltk.ngrams(processed_sentence, n))

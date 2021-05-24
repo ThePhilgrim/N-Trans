@@ -1,7 +1,7 @@
 """
 The usage of this script relies on the N-gram files in "./ngrams"
 
-These files are created through ntrans_dataprep.py
+These files are generated through ntrans_dataprep.py and processed in ntrans_combine.py
 """
 
 import translatepy  # type: ignore
@@ -71,7 +71,5 @@ def read_ngram_files(
 
     machine_translate_ngrams(ngrams)
 
-
-# CODE TESTING:
 
 read_ngram_files()
