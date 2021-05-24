@@ -9,19 +9,38 @@ These N-grams are thereafter written to separate .csv files.
 
 import csv
 import collections
-import glob
+import pathlib
 
 
-def count_ngrams(ngram, count):
+def delete_chunkfiles():
     pass
 
 
-def read_ngram_files():
+def write_combined_files(ngram_counter):
+    """
+    Writes the finalized X most common N-grams to csv-files.
+    """
+    pathlib.Path("ngrams").mkdir(exist_ok=True)
+
+    for n, collections_counter in ngram_counter.items():
+        file_path = f"ngrams/{n}-grams.csv"
+        print(f"Writing finalized {n}-gram file")
+
+        with open(file_path, mode="w") as write_ngram_file:
+            data_writer = csv.writer(write_ngram_file)
+
+            for ngram, count in collections_counter:
+                data_writer.writerow((ngram, count))
+
+    # Warning: Don't uncomment if you still need the chunked files after running the script
+    # delete_chunkfiles()
+
+
+def combine_chunkfiles_into_counter():
     """
     Reads the chunked csv-files generated in ntrans_dataprep.py and calculates the sum of occurrences
     of each N-gram.
     """
-    # TODO: Update docstring when count_ngrams() works.
 
     ngram_counter = {
         2: [],
@@ -31,42 +50,25 @@ def read_ngram_files():
         6: [],
     }
 
-    for n in range(2, 4):  # "for key in ngram_counter" when test phase is over
-
+    for n in ngram_counter:
         ctr = collections.Counter()
-        chunk_files = glob.glob(f"ngram_data_chunks/chunk*_{n}-grams.csv")
+        chunk_files = list(pathlib.Path("ngram_data_chunks").glob(f"chunk*_{n}-grams.csv"))
 
         for enum, file in enumerate(chunk_files, start=1):
-
-            print(f"Currently counting {file}. (File {enum}/{len(chunk_files)})")
+            print(f"Counting {n}-grams. Currently file {enum}/{len(chunk_files)})")
 
             with open(file) as ngram_file:
-
                 read_csv = csv.reader(ngram_file)
 
                 for enum, row in enumerate(read_csv):
                     ctr[row[0]] += int(
                         row[1]
-                    )  # TODO: Send Counting to separate function
+                    )
 
-        ngram_counter[n].append(ctr.most_common(5000))
-        print(ngram_counter[n])
+        for counted_ngram in ctr.most_common(10000):
+            ngram_counter[n].append(counted_ngram)
+
+    write_combined_files(ngram_counter)
 
 
-read_ngram_files()
-
-
-"""
-IMPLEMENTATION NOTES:
-
-for loop 2 - 6 (n for ngram)
-
-    for loop all files 2 grams, then all files 3 grams, etc.
-
-    add all strings to counter
-
-    call write_csv_function(current_counter)
-
-    clear counter
-
-"""
+combine_chunkfiles_into_counter()
