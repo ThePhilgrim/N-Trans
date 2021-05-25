@@ -21,15 +21,7 @@ def delete_chunkfiles() -> None:
     Deletes the generated chunked csv files after the finalized csv files have been finalized.
     """
     prompt = "Are you sure you want to delete the chunked data files? This can not be undone. (y/n) "
-    confirm = (
-        str(
-            input(
-                prompt
-            )
-        )
-        .lower()
-        .strip()
-    )
+    confirm = str(input(prompt)).lower().strip()
 
     path_datachunks = pathlib.Path(("./ngram_data_chunks"))
 
