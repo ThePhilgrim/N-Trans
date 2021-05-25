@@ -11,7 +11,7 @@ jobs:
     - run: |
         python3 -m pip install black
     - run: |
-        python3 -m black --check ntrans.py ntrans_dataprep.py
+        python3 -m black --check ntrans.py ntrans_dataprep.py ntrans_combine.py
   mypy:
     runs-on: ubuntu-latest
     steps:
