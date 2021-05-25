@@ -20,10 +20,11 @@ def delete_chunkfiles() -> None:
     """
     Deletes the generated chunked csv files after the finalized csv files have been finalized.
     """
+    prompt = "Are you sure you want to delete the chunked data files? This can not be undone. (y/n) "
     confirm = (
         str(
             input(
-                "Are you sure you want to delete the chunked data files? This can not be undone. (y/n) "
+                prompt
             )
         )
         .lower()
@@ -56,7 +57,7 @@ def write_combined_files(ngram_counter: Dict[int, List[NGramCounter]]) -> None:
 
     for n, collections_counter in ngram_counter.items():
         file_path = f"ngrams/{n}-grams.csv"
-        print(f"Writing finalized {n}-gram file")
+        print(f"Writing {file_path}")
 
         with open(file_path, mode="w") as write_ngram_file:
             data_writer = csv.writer(write_ngram_file)
