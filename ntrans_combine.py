@@ -1,7 +1,7 @@
 """
 Reads the .csv files containing N-grams that were generated in ntrans_dataprep.py
 
-Inserts every N-gram into a collections.Counter, to determine the 50K most frequent N-grams of each sorted
+Inserts every N-gram into a collections.Counter, to determine the 10K most frequent N-grams of each sorted
 (2-grams, 3-grams, etc.).
 
 These N-grams are thereafter written to separate .csv files.
@@ -13,7 +13,33 @@ import pathlib
 
 
 def delete_chunkfiles():
-    pass
+    confirm = (
+        str(
+            input(
+                "Are you sure you want to delete the chunked data files? This can not be undone. (y/n) "
+            )
+        )
+        .lower()
+        .strip()
+    )
+
+    path_datachunks = pathlib.Path(("./ngram_data_chunks"))
+
+    if confirm == "y":
+        if not path_datachunks.exists():
+            print("Cannot find the folder 'ngram_data_chunks'.")
+            return
+        else:
+            print("Deleting files ...")
+            for file in path_datachunks.glob("*.csv"):
+                file.unlink()
+
+            pathlib.Path("./ngram_data_chunks").rmdir()
+    elif confirm == "n":
+        return
+    else:
+        print("Please provide a valid input, 'y' or 'n'.")
+        return delete_chunkfiles()
 
 
 def write_combined_files(ngram_counter):
@@ -50,9 +76,19 @@ def combine_chunkfiles_into_counter():
         6: [],
     }
 
+    path_datachunks = pathlib.Path(("./ngram_data_chunks"))
+
+    if not path_datachunks.exists():
+        print(
+            """
+            Cannot find folder 'ngram_data_chunks'. Please make sure that you have run
+            ntrans_dataprep.py to generate the chunked data files before running this script.
+            """
+        )
+        return
     for n in ngram_counter:
         ctr = collections.Counter()
-        chunk_files = list(pathlib.Path("ngram_data_chunks").glob(f"chunk*_{n}-grams.csv"))
+        chunk_files = list(path_datachunks).glob(f"chunk*_{n}-grams.csv")
 
         for enum, file in enumerate(chunk_files, start=1):
             print(f"Counting {n}-grams. Currently file {enum}/{len(chunk_files)})")
@@ -61,9 +97,7 @@ def combine_chunkfiles_into_counter():
                 read_csv = csv.reader(ngram_file)
 
                 for enum, row in enumerate(read_csv):
-                    ctr[row[0]] += int(
-                        row[1]
-                    )
+                    ctr[row[0]] += int(row[1])
 
         for counted_ngram in ctr.most_common(10000):
             ngram_counter[n].append(counted_ngram)
