@@ -10,13 +10,13 @@ These N-grams are thereafter written to separate .csv files.
 import csv
 import collections
 import pathlib
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple
 
 
 NGramCounter = Tuple[str, int]
 
 
-def delete_chunkfiles():
+def delete_chunkfiles() -> None:
     """
     Deletes the generated chunked csv files after the finalized csv files have been finalized.
     """
@@ -46,7 +46,7 @@ def delete_chunkfiles():
         return
     else:
         print("Please provide a valid input, 'y' or 'n'.")
-        return delete_chunkfiles()
+        delete_chunkfiles()
 
 
 def write_combined_files(ngram_counter: Dict[int, List[NGramCounter]]) -> None:
