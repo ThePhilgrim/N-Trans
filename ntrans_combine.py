@@ -36,12 +36,11 @@ def delete_chunkfiles() -> None:
         if not path_datachunks.exists():
             print("Cannot find the folder 'ngram_data_chunks'.")
             return
-        else:
-            print("Deleting files ...")
-            for file in path_datachunks.glob("*.csv"):
-                file.unlink()
+        print("Deleting files ...")
+        for file in path_datachunks.glob("*.csv"):
+            file.unlink()
 
-            pathlib.Path("./ngram_data_chunks").rmdir()
+        pathlib.Path("./ngram_data_chunks").rmdir()
     elif confirm == "n":
         return
     else:
@@ -88,8 +87,9 @@ def combine_chunkfiles_into_counter() -> None:
     if not path_datachunks.exists():
         print(
             """
-            Cannot find folder 'ngram_data_chunks'. Please make sure that you have run
-            ntrans_dataprep.py to generate the chunked data files before running this script.
+            Cannot find folder 'ngram_data_chunks'.
+            Please make sure that you have run ntrans_dataprep.py to generate
+            the chunked data files before running this script.
             """
         )
         return
