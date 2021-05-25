@@ -12,7 +12,9 @@ from typing import List, Dict, Tuple, Optional
 SourceTarget = Tuple[str, str]
 
 
-def create_csv_file(source_target_pairs: List[SourceTarget], save_path: Optional[str] = None) -> None:
+def create_csv_file(
+    source_target_pairs: List[SourceTarget], save_path: Optional[str] = None
+) -> None:
     """
     Writes source/target pairs to a csv-file
     """
