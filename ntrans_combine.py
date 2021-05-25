@@ -88,7 +88,7 @@ def combine_chunkfiles_into_counter():
         return
     for n in ngram_counter:
         ctr = collections.Counter()
-        chunk_files = list(path_datachunks).glob(f"chunk*_{n}-grams.csv")
+        chunk_files = list(path_datachunks.glob(f"chunk*_{n}-grams.csv"))
 
         for enum, file in enumerate(chunk_files, start=1):
             print(f"Counting {n}-grams. Currently file {enum}/{len(chunk_files)})")
