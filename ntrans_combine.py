@@ -10,9 +10,16 @@ These N-grams are thereafter written to separate .csv files.
 import csv
 import collections
 import pathlib
+from typing import Dict, List, Tuple, Union
+
+
+NGramCounter = Tuple[str, int]
 
 
 def delete_chunkfiles():
+    """
+    Deletes the generated chunked csv files after the finalized csv files have been finalized.
+    """
     confirm = (
         str(
             input(
@@ -42,7 +49,7 @@ def delete_chunkfiles():
         return delete_chunkfiles()
 
 
-def write_combined_files(ngram_counter):
+def write_combined_files(ngram_counter: Dict[int, List[NGramCounter]]) -> None:
     """
     Writes the finalized X most common N-grams to csv-files.
     """
@@ -62,13 +69,13 @@ def write_combined_files(ngram_counter):
     # delete_chunkfiles()
 
 
-def combine_chunkfiles_into_counter():
+def combine_chunkfiles_into_counter() -> None:
     """
     Reads the chunked csv-files generated in ntrans_dataprep.py and calculates the sum of occurrences
     of each N-gram.
     """
 
-    ngram_counter = {
+    ngram_counter: Dict[int, List[NGramCounter]] = {
         2: [],
         3: [],
         4: [],
@@ -87,7 +94,7 @@ def combine_chunkfiles_into_counter():
         )
         return
     for n in ngram_counter:
-        ctr = collections.Counter()
+        ctr: collections.Counter[str] = collections.Counter()
         chunk_files = list(path_datachunks.glob(f"chunk*_{n}-grams.csv"))
 
         for enum, file in enumerate(chunk_files, start=1):
