@@ -58,7 +58,7 @@ def write_combined_files(ngram_counter: Dict[int, List[NGramCounter]]) -> None:
 
     for n, collections_counter in ngram_counter.items():
         file_path = f"ngrams/{n}-grams.csv"
-        print(f"Writing finalized {n}-gram file")
+        print(f"Writing {file_path}")
 
         with open(file_path, mode="w") as write_ngram_file:
             data_writer = csv.writer(write_ngram_file)
