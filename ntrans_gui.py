@@ -206,7 +206,46 @@ class NTransMainGui:
         # TODO: Deselect "select all" if any N-grams are deselected
 
     def open_about_window(self):
-        pass
+        self.about_window = AboutWindow()
+
+
+class AboutWindow:
+    def __init__(self):
+        self.about_window = tkinter.Toplevel()
+        self.about_window.resizable(False, False)
+        self.about_window.title("About N-Trans")
+
+        self.mainframe = ttk.Frame(self.about_window)
+        self.mainframe.pack(fill="both", expand=True)
+
+        header = ttk.Label(
+            self.mainframe, text="About N-Trans", font=("TkDefaultFont", 18)
+        )
+
+        main_text = ttk.Label(
+            self.mainframe,
+            text="""
+        N-Trans is written by Philip Sundt to help professional translators improve
+        workflow in their CAT tool of choice.
+
+        The generated N-Trans dictionary is based on the most frequent N-grams
+        in the British National Corpus.
+
+        Disclaimer: The N-Trans dictionary is machine translated and is meant
+        to be used as a complement to manual human translations. Any incorrect
+        or poor quality machine translations should be edited in the termbase.
+        The quality of the translations in the N-Trans dictionary cannot be
+        guaranteed. No developer of N-Trans can be held responsible for poor
+        quality translations made as a direct or indirect result of the N-Trans
+        dictionary.
+        """,
+        )  # TODO: Improve main text
+
+        credit_text = ttk.Label(self.mainframe, text="Thanks to Akuli")
+
+        header.grid(column=0, row=0, padx=(0, 0), pady=(20, 20))
+        main_text.grid(sticky="W", column=0, row=1, padx=(10, 30), pady=(0, 30))
+        credit_text.grid(sticky="E", column=0, row=2, padx=(0, 30), pady=(30, 10))
 
 
 ntrans_gui = NTransMainGui()
