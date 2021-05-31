@@ -6,6 +6,9 @@ from tkinter import ttk
 
 class NTransMainGui:
     def __init__(self):
+        # User-determined variables
+        self.included_ngrams = [2, 3, 4, 5, 6]
+
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -22,6 +25,7 @@ class NTransMainGui:
         )
 
         # Get directory path to save csv file
+        # TODO: Add default save path depending on OS
         get_savepath_button = ttk.Button(
             self.mainframe, command=self.get_save_file_path, text="Browse..."
         )
@@ -75,10 +79,10 @@ class NTransMainGui:
         # What language to translate into
         target_language_label = ttk.Label(self.mainframe, text="Target language")
 
-        target_language_var = tkinter.StringVar()
+        self.target_language_var = tkinter.StringVar()
 
         target_language = ttk.Combobox(
-            self.mainframe, state="readonly", textvariable=target_language_var
+            self.mainframe, state="readonly", textvariable=self.target_language_var
         )
 
         target_language["values"] = (
@@ -96,10 +100,10 @@ class NTransMainGui:
             self.mainframe, text="Amount of each N-gram to include"
         )
 
-        data_size_var = tkinter.StringVar()
+        self.data_size_var = tkinter.StringVar()
 
         ngram_data_size = ttk.Combobox(
-            self.mainframe, state="readonly", textvariable=data_size_var
+            self.mainframe, state="readonly", textvariable=self.data_size_var
         )
 
         ngram_data_size["values"] = (
@@ -186,7 +190,15 @@ class NTransMainGui:
             self.filepath.set(self.savepath)
 
     def generate_ntrans_dictionary(self):
-        pass
+        self.user_choices = {
+            "save_path": self.savepath,
+            "included_ngrams": self.included_ngrams,
+            "amount_of_ngrams": self.data_size_var.get(),
+            "target_language": self.target_language_var.get(),
+        }
+
+        for key in self.user_choices:
+            print(self.user_choices[key])
 
     def open_help_page(self):
         webbrowser.open_new_tab(
