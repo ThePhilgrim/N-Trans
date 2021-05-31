@@ -1,3 +1,4 @@
+import webbrowser
 import tkinter
 from tkinter import filedialog
 from tkinter import ttk
@@ -188,7 +189,9 @@ class NTransMainGui:
         pass
 
     def open_help_page(self):
-        pass
+        webbrowser.open_new_tab(
+            "https://www.google.com"
+        )  # TODO: Write help document and link to it
 
     def select_all_ngrams(self):
         if self.select_all_checked.get():
