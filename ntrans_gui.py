@@ -42,38 +42,41 @@ class NTransMainGui:
         self.deselected = 0
         self.selected = 1
 
-        self.select_all_checked = tkinter.IntVar(value=self.selected)
-        self.two_gram_checked = tkinter.IntVar(value=self.selected)
-        self.three_gram_checked = tkinter.IntVar(value=self.selected)
-        self.four_gram_checked = tkinter.IntVar(value=self.selected)
-        self.five_gram_checked = tkinter.IntVar(value=self.selected)
-        self.six_gram_checked = tkinter.IntVar(value=self.selected)
+        self.checked_select_all = tkinter.IntVar(value=self.selected)
+        self.checked_2_gram = tkinter.IntVar(value=self.selected)
+        self.checked_3_gram = tkinter.IntVar(value=self.selected)
+        self.checked_4_gram = tkinter.IntVar(value=self.selected)
+        self.checked_5_gram = tkinter.IntVar(value=self.selected)
+        self.checked_6_gram = tkinter.IntVar(value=self.selected)
 
         select_all_check = ttk.Checkbutton(
             self.mainframe,
             text="Select all",
-            variable=self.select_all_checked,
+            variable=self.checked_select_all,
             command=self.select_all_ngrams,
         )  # TODO: Add method that selects/deselects all and changes the text to reflect state.
 
         two_gram_check = ttk.Checkbutton(
-            self.mainframe, text="2-grams", variable=self.two_gram_checked
+            self.mainframe,
+            text="2-grams",
+            variable=self.checked_2_gram,
+            command=self.update_ngram_checkbox(2),
         )
 
         three_gram_check = ttk.Checkbutton(
-            self.mainframe, text="3-grams", variable=self.three_gram_checked
+            self.mainframe, text="3-grams", variable=self.checked_3_gram
         )
 
         four_gram_check = ttk.Checkbutton(
-            self.mainframe, text="4-grams", variable=self.four_gram_checked
+            self.mainframe, text="4-grams", variable=self.checked_4_gram
         )
 
         five_gram_check = ttk.Checkbutton(
-            self.mainframe, text="5-grams", variable=self.five_gram_checked
+            self.mainframe, text="5-grams", variable=self.checked_5_gram
         )
 
         six_gram_check = ttk.Checkbutton(
-            self.mainframe, text="6-grams", variable=self.six_gram_checked
+            self.mainframe, text="6-grams", variable=self.checked_6_gram
         )
 
         # What language to translate into
@@ -185,20 +188,29 @@ class NTransMainGui:
         help_button.pack(side="right")
 
     def get_save_file_path(self):
+        # TODO: Check filepath for validity
         self.savepath = filedialog.askdirectory()
         if self.savepath:
             self.filepath.set(self.savepath)
 
     def generate_ntrans_dictionary(self):
         self.user_choices = {
-            "save_path": self.savepath,
+            "save_path": self.filepath.get(),
             "included_ngrams": self.included_ngrams,
             "amount_of_ngrams": self.data_size_var.get(),
             "target_language": self.target_language_var.get(),
         }
 
         for key in self.user_choices:
-            print(self.user_choices[key])
+            if not self.user_choices[key]:
+                print(
+                    "All fields need to be filled in before generating the N-Trans dictionary."
+                )  # TODO: Change print to label
+                break
+
+        # TODO: Check filepath for validity
+
+        # TODO: Call logic Here
 
     def open_help_page(self):
         webbrowser.open_new_tab(
@@ -206,7 +218,7 @@ class NTransMainGui:
         )  # TODO: Write help document and link to it
 
     def select_all_ngrams(self):
-        if self.select_all_checked.get():
+        if self.checked_select_all.get():
             self.two_gram_checked.set(self.selected)
             self.three_gram_checked.set(self.selected)
             self.four_gram_checked.set(self.selected)
@@ -222,6 +234,20 @@ class NTransMainGui:
 
     def open_about_window(self):
         self.about_window = AboutWindow()
+
+    def control_path_validity(self):
+        pass
+
+    def update_ngram_checkbox(self, ngram):
+        # method_caller = f"self.checked_{ngram}_gram"
+        # print(ngram)
+        # print(method_caller)
+        #
+        # if method_caller.get():
+        #     print("POSITIVE!")
+        # else:
+        #     print("NEGATIVE!")
+        pass
 
 
 class AboutWindow:
