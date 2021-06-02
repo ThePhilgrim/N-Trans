@@ -1,10 +1,15 @@
 import webbrowser
 import tkinter
+import functools
 from tkinter import filedialog
 from tkinter import ttk
 
 
 class NTransMainGui:
+    """
+    Constitutes the main settings window where the user customize their N-Trans dictionary
+    """
+
     def __init__(self):
         # User-determined variables
         self.included_ngrams = [2, 3, 4, 5, 6]
@@ -14,12 +19,12 @@ class NTransMainGui:
         self.root.resizable(False, False)
         self.root.title("N-Trans")
 
-        self.mainframe = ttk.Frame(self.root)
-        self.mainframe.pack(fill="both", expand=True)
+        mainframe = ttk.Frame(self.root)
+        mainframe.pack(fill="both", expand=True)
 
         # Header
         header = ttk.Label(
-            self.mainframe,
+            mainframe,
             text="N-Trans Dictionary Settings",
             font=("TkDefaultFont", 18),
         )
@@ -27,65 +32,46 @@ class NTransMainGui:
         # Get directory path to save csv file
         # TODO: Add default save path depending on OS
         get_savepath_button = ttk.Button(
-            self.mainframe, command=self.get_save_file_path, text="Browse..."
+            mainframe, command=self.get_save_file_path, text="Browse..."
         )
 
         self.filepath = tkinter.StringVar()
 
-        filepath_label = ttk.Label(self.mainframe, text="Save N-Trans dictionary to")
+        filepath_label = ttk.Label(mainframe, text="Save N-Trans dictionary to")
 
-        show_filepath = ttk.Entry(self.mainframe, textvariable=self.filepath, width=25)
+        show_filepath = ttk.Entry(mainframe, textvariable=self.filepath, width=25)
 
         # What N-Grams to include in csv file.
-        ngram_check_label = ttk.Label(self.mainframe, text="Choose N-grams to include")
+        ngram_check_label = ttk.Label(mainframe, text="Choose N-grams to include")
 
-        self.deselected = 0
-        self.selected = 1
+        self.select_all_var = tkinter.BooleanVar(value=True)
 
-        self.checked_select_all = tkinter.IntVar(value=self.selected)
-        self.checked_2_gram = tkinter.IntVar(value=self.selected)
-        self.checked_3_gram = tkinter.IntVar(value=self.selected)
-        self.checked_4_gram = tkinter.IntVar(value=self.selected)
-        self.checked_5_gram = tkinter.IntVar(value=self.selected)
-        self.checked_6_gram = tkinter.IntVar(value=self.selected)
+        self.checkbox_vars = {n: tkinter.BooleanVar(value=True) for n in range(2, 7)}
 
-        select_all_check = ttk.Checkbutton(
-            self.mainframe,
-            text="Select all",
-            variable=self.checked_select_all,
+        select_all_checkbutton = ttk.Checkbutton(
+            mainframe,
+            text="Select/Deselect all",
+            variable=self.select_all_var,
             command=self.select_all_ngrams,
-        )  # TODO: Add method that selects/deselects all and changes the text to reflect state.
-
-        two_gram_check = ttk.Checkbutton(
-            self.mainframe,
-            text="2-grams",
-            variable=self.checked_2_gram,
-            command=self.update_ngram_checkbox(2),
         )
 
-        three_gram_check = ttk.Checkbutton(
-            self.mainframe, text="3-grams", variable=self.checked_3_gram
-        )
-
-        four_gram_check = ttk.Checkbutton(
-            self.mainframe, text="4-grams", variable=self.checked_4_gram
-        )
-
-        five_gram_check = ttk.Checkbutton(
-            self.mainframe, text="5-grams", variable=self.checked_5_gram
-        )
-
-        six_gram_check = ttk.Checkbutton(
-            self.mainframe, text="6-grams", variable=self.checked_6_gram
-        )
+        n_to_ngram_checkbox = {
+            n: ttk.Checkbutton(
+                mainframe,
+                text=f"{n}-grams",
+                variable=var,
+                command=functools.partial(self.update_ngram_checkbox, n),
+            )
+            for n, var in self.checkbox_vars.items()
+        }
 
         # What language to translate into
-        target_language_label = ttk.Label(self.mainframe, text="Target language")
+        target_language_label = ttk.Label(mainframe, text="Target language")
 
         self.target_language_var = tkinter.StringVar()
 
         target_language = ttk.Combobox(
-            self.mainframe, state="readonly", textvariable=self.target_language_var
+            mainframe, state="readonly", textvariable=self.target_language_var
         )
 
         target_language["values"] = (
@@ -96,29 +82,25 @@ class NTransMainGui:
             "Italian",
         )
 
-        target_language.current()
-
         # How many of each N-Gram to translate
-        data_size_label = ttk.Label(
-            self.mainframe, text="Amount of each N-gram to include"
-        )
+        data_size_label = ttk.Label(mainframe, text="Amount of each N-gram to include")
 
-        self.data_size_var = tkinter.StringVar()
+        self.data_size_var = tkinter.IntVar()
 
         ngram_data_size = ttk.Combobox(
-            self.mainframe, state="readonly", textvariable=self.data_size_var
+            mainframe, state="readonly", textvariable=self.data_size_var
         )
 
         ngram_data_size["values"] = (
-            "100",
-            "300",
-            "500",
-            "800",
-            "1000",
-            "1500",
-            "3000",
-            "5000",
-            "10000",
+            100,
+            300,
+            500,
+            800,
+            1000,
+            1500,
+            3000,
+            5000,
+            10000,
         )
 
         ngram_data_size.current(6)
@@ -131,9 +113,9 @@ class NTransMainGui:
             foreground="yellow",
             background="black",
             padding=30,
-        )  # TODO: Background not working
+        )
         generate_dictionary = ttk.Button(
-            self.mainframe,
+            mainframe,
             command=self.generate_ntrans_dictionary,
             text="Generate N-Trans Dictionary",
             style="W.TButton",
@@ -142,26 +124,36 @@ class NTransMainGui:
         # About / Help
 
         # To fit About & Help button in same column
-        self.button_frame = ttk.Frame(self.mainframe)
+        button_frame = ttk.Frame(mainframe)
 
         about_button = ttk.Button(
-            self.button_frame, command=self.open_about_window, text="About", style=""
+            button_frame, command=self.open_about_window, text="About", style=""
         )  # TODO: Make command into lambda instantiating about-class
-        help_button = ttk.Button(
-            self.button_frame, command=self.open_help_page, text="Help"
-        )
+        help_button = ttk.Button(button_frame, command=self.open_help_page, text="Help")
 
         # Widget Positioning
         header.grid(column=0, row=0, columnspan=2, padx=(0, 0), pady=(30, 30))
 
         ngram_check_label.grid(sticky="N", column=0, row=1, padx=(20, 0), pady=(10, 10))
 
-        select_all_check.grid(sticky="W", column=0, row=2, padx=(40, 0), pady=(0, 10))
-        two_gram_check.grid(sticky="W", column=0, row=3, padx=(40, 0), pady=(0, 0))
-        three_gram_check.grid(sticky="W", column=0, row=4, padx=(40, 0), pady=(0, 0))
-        four_gram_check.grid(sticky="W", column=0, row=5, padx=(40, 0), pady=(0, 0))
-        five_gram_check.grid(sticky="W", column=0, row=6, padx=(40, 0), pady=(0, 0))
-        six_gram_check.grid(sticky="W", column=0, row=7, padx=(40, 0), pady=(0, 0))
+        select_all_checkbutton.grid(
+            sticky="W", column=0, row=2, padx=(40, 0), pady=(0, 10)
+        )
+        n_to_ngram_checkbox[2].grid(
+            sticky="W", column=0, row=3, padx=(40, 0), pady=(0, 0)
+        )
+        n_to_ngram_checkbox[3].grid(
+            sticky="W", column=0, row=4, padx=(40, 0), pady=(0, 0)
+        )
+        n_to_ngram_checkbox[4].grid(
+            sticky="W", column=0, row=5, padx=(40, 0), pady=(0, 0)
+        )
+        n_to_ngram_checkbox[5].grid(
+            sticky="W", column=0, row=6, padx=(40, 0), pady=(0, 0)
+        )
+        n_to_ngram_checkbox[6].grid(
+            sticky="W", column=0, row=7, padx=(40, 0), pady=(0, 0)
+        )
 
         data_size_label.grid(sticky="W", column=0, row=8, padx=(20, 0), pady=(30, 0))
         ngram_data_size.grid(sticky="W", column=0, row=9, padx=(20, 0), pady=(5, 0))
@@ -181,7 +173,7 @@ class NTransMainGui:
             column=0, row=14, columnspan=2, padx=(0, 0), pady=(30, 30)
         )
 
-        self.button_frame.grid(
+        button_frame.grid(
             sticky="E", column=0, row=15, columnspan=2, padx=(20, 20), pady=(0, 10)
         )
         about_button.pack(side="left")
@@ -218,19 +210,18 @@ class NTransMainGui:
         )  # TODO: Write help document and link to it
 
     def select_all_ngrams(self):
-        if self.checked_select_all.get():
-            self.two_gram_checked.set(self.selected)
-            self.three_gram_checked.set(self.selected)
-            self.four_gram_checked.set(self.selected)
-            self.five_gram_checked.set(self.selected)
-            self.six_gram_checked.set(self.selected)
+        if self.select_all_var.get():
+            for n in self.checkbox_vars:
+                self.checkbox_vars[n].set(True)
+
+            for n in range(2, 7):
+                if n not in self.included_ngrams:
+                    self.included_ngrams.append(n)
         else:
-            self.two_gram_checked.set(self.deselected)
-            self.three_gram_checked.set(self.deselected)
-            self.four_gram_checked.set(self.deselected)
-            self.five_gram_checked.set(self.deselected)
-            self.six_gram_checked.set(self.deselected)
-        # TODO: Deselect "select all" if any N-grams are deselected
+            for n in self.checkbox_vars:
+                self.checkbox_vars[n].set(False)
+
+            self.included_ngrams.clear()
 
     def open_about_window(self):
         self.about_window = AboutWindow()
@@ -238,16 +229,14 @@ class NTransMainGui:
     def control_path_validity(self):
         pass
 
-    def update_ngram_checkbox(self, ngram):
-        # method_caller = f"self.checked_{ngram}_gram"
-        # print(ngram)
-        # print(method_caller)
-        #
-        # if method_caller.get():
-        #     print("POSITIVE!")
-        # else:
-        #     print("NEGATIVE!")
-        pass
+    def update_ngram_checkbox(self, n):
+        if self.checkbox_vars[n].get():
+            self.checkbox_vars[n].set(True)
+            self.included_ngrams.append(n)
+        else:
+            self.checkbox_vars[n].set(False)
+            self.select_all_var.set(False)
+            self.included_ngrams.remove(n)
 
 
 class AboutWindow:
@@ -256,15 +245,13 @@ class AboutWindow:
         self.about_window.resizable(False, False)
         self.about_window.title("About N-Trans")
 
-        self.mainframe = ttk.Frame(self.about_window)
-        self.mainframe.pack(fill="both", expand=True)
+        mainframe = ttk.Frame(self.about_window)
+        mainframe.pack(fill="both", expand=True)
 
-        header = ttk.Label(
-            self.mainframe, text="About N-Trans", font=("TkDefaultFont", 18)
-        )
+        header = ttk.Label(mainframe, text="About N-Trans", font=("TkDefaultFont", 18))
 
         main_text = ttk.Label(
-            self.mainframe,
+            mainframe,
             text="""
         N-Trans is written by Philip Sundt to help professional translators improve
         workflow in their CAT tool of choice.
@@ -282,7 +269,7 @@ class AboutWindow:
         """,
         )  # TODO: Improve main text
 
-        credit_text = ttk.Label(self.mainframe, text="Thanks to Akuli")
+        credit_text = ttk.Label(mainframe, text="Thanks to Akuli")
 
         header.grid(column=0, row=0, padx=(0, 0), pady=(20, 20))
         main_text.grid(sticky="W", column=0, row=1, padx=(10, 30), pady=(0, 30))
