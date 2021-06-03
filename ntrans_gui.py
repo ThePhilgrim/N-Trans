@@ -1,9 +1,7 @@
 import webbrowser
 import tkinter
+import tkinter.filedialog
 import functools
-from tkinter import (
-    filedialog,
-)  # TODO: Figure out why I can't remove this import and use tkinter.filedialog... "self.savepath = tkinter.filedialog.askdirectory()" gives AttributeError: module 'tkinter' has no attribute 'filedialog'
 from tkinter import ttk
 
 
@@ -138,28 +136,28 @@ class NTransMainGui:
         # ==================
         # Widget placement
         # ==================
-        header.grid(column=0, row=0, columnspan=2, padx=(0, 0), pady=(30, 30))
+        header.grid(column=0, columnspan=2, padx=(0, 0), pady=(30, 30))
 
-        ngram_check_label.grid(sticky="N", column=0, row=1, padx=(20, 0), pady=(10, 10))
+        ngram_check_label.grid(sticky="N", column=0, padx=(0, 0), pady=(10, 10))
 
-        select_all_checkbutton.grid(sticky="W", column=0, row=2, padx=(40, 0), pady=(0, 10))
+        select_all_checkbutton.grid(sticky="W", column=0, padx=(40, 0), pady=(0, 10))
 
-        for n in n_to_ngram_checkbox:
-            n_to_ngram_checkbox[n].grid(sticky="W", column=0, padx=(40, 0), pady=(0, 0))
+        for checkbox in n_to_ngram_checkbox.values():
+            checkbox.grid(sticky="W", column=0, padx=(40, 0), pady=(0, 0))
 
-        data_size_label.grid(sticky="W", column=0, row=8, padx=(20, 0), pady=(30, 0))
-        ngram_data_size.grid(sticky="W", column=0, row=9, padx=(20, 0), pady=(5, 0))
+        data_size_label.grid(sticky="W", column=0, padx=(20, 0), pady=(30, 0))
+        ngram_data_size.grid(sticky="W", column=0, padx=(20, 0), pady=(5, 0))
 
-        target_language_label.grid(sticky="W", column=0, row=10, padx=(20, 20), pady=(30, 0))
-        target_language.grid(sticky="W", column=0, row=11, padx=(20, 20), pady=(0, 0))
+        target_language_label.grid(sticky="W", column=0, padx=(20, 20), pady=(30, 0))
+        target_language.grid(sticky="W", column=0, padx=(20, 20), pady=(0, 0))
 
-        filepath_label.grid(sticky="W", column=0, row=12, padx=(20, 0), pady=(30, 10))
-        show_filepath.grid(sticky="W", column=0, row=13, padx=(20, 0), pady=(0, 10))
+        filepath_label.grid(sticky="W", column=0, padx=(20, 0), pady=(30, 10))
+        show_filepath.grid(sticky="W", column=0, padx=(20, 0), pady=(0, 10))
         get_savepath_button.grid(sticky="W", column=1, row=13, padx=(0, 20), pady=(0, 10))
 
-        generate_dictionary.grid(column=0, row=14, columnspan=2, padx=(0, 0), pady=(30, 30))
+        generate_dictionary.grid(column=0, columnspan=2, padx=(0, 0), pady=(30, 30))
 
-        about_help_buttonframe.grid(sticky="E", column=0, row=15, columnspan=2, padx=(20, 20), pady=(0, 10))
+        about_help_buttonframe.grid(sticky="E", column=0, columnspan=2, padx=(20, 20), pady=(0, 10))
         about_button.pack(side="left")
         help_button.pack(side="right")
 
@@ -167,9 +165,9 @@ class NTransMainGui:
         # fmt: on
 
     def get_save_file_path(self) -> None:
-        self.savepath: str = filedialog.askdirectory()  # type: ignore
-        if self.savepath:
-            self.filepath.set(self.savepath)
+        savepath = tkinter.filedialog.askdirectory()  # type: ignore
+        if savepath:
+            self.filepath.set(savepath)
 
     def generate_ntrans_dictionary(self) -> None:
         self.user_choices = {
@@ -212,10 +210,9 @@ class NTransMainGui:
         pass
 
     def update_ngram_checkbox(self, n: int) -> None:
-        if self.checkbox_vars[n].get():
-            self.checkbox_vars[n].set(True)
-        else:
-            self.checkbox_vars[n].set(False)
+        self.checkbox_vars[n].get()
+
+        if not self.checkbox_vars[n].get():
             self.select_all_var.set(False)
 
 
@@ -251,9 +248,9 @@ class AboutWindow:
 
         credit_text = ttk.Label(mainframe, text="Thanks to Akuli")
 
-        header.grid(column=0, row=0, padx=(0, 0), pady=(20, 20))
-        main_text.grid(sticky="W", column=0, row=1, padx=(10, 30), pady=(0, 30))
-        credit_text.grid(sticky="E", column=0, row=2, padx=(0, 30), pady=(30, 10))
+        header.grid(column=0, padx=(0, 0), pady=(20, 20))
+        main_text.grid(sticky="W", column=0, padx=(10, 30), pady=(0, 30))
+        credit_text.grid(sticky="E", column=0, padx=(0, 30), pady=(30, 10))
 
 
 ntrans_gui = NTransMainGui()
