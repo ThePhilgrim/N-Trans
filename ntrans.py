@@ -19,9 +19,7 @@ def create_csv_file(
     Writes source/target pairs to a csv-file
     """
 
-    path = (
-        user_choices["save_path"] + "/"
-    )
+    path = user_choices["save_path"] + "/"
     filename = "ntrans-glossary.csv"  # TODO: Make filename depend on user input
     full_path = path + filename
 
