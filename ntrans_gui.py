@@ -143,11 +143,9 @@ class NTransMainGui:
         ngram_check_label.grid(sticky="N", column=0, row=1, padx=(20, 0), pady=(10, 10))
 
         select_all_checkbutton.grid(sticky="W", column=0, row=2, padx=(40, 0), pady=(0, 10))
-        n_to_ngram_checkbox[2].grid(sticky="W", column=0, row=3, padx=(40, 0), pady=(0, 0))
-        n_to_ngram_checkbox[3].grid(sticky="W", column=0, row=4, padx=(40, 0), pady=(0, 0))
-        n_to_ngram_checkbox[4].grid(sticky="W", column=0, row=5, padx=(40, 0), pady=(0, 0))
-        n_to_ngram_checkbox[5].grid(sticky="W", column=0, row=6, padx=(40, 0), pady=(0, 0))
-        n_to_ngram_checkbox[6].grid(sticky="W", column=0, row=7, padx=(40, 0), pady=(0, 0))
+
+        for n in n_to_ngram_checkbox:
+            n_to_ngram_checkbox[n].grid(sticky="W", column=0, padx=(40, 0), pady=(0, 0))
 
         data_size_label.grid(sticky="W", column=0, row=8, padx=(20, 0), pady=(30, 0))
         ngram_data_size.grid(sticky="W", column=0, row=9, padx=(20, 0), pady=(5, 0))
