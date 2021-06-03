@@ -50,7 +50,7 @@ def machine_translate_ngrams(
             print(f"Translating {key}-gram no. {enum} / {len(value)}")
             target_ngram = str(
                 translator.translate(source_ngram, user_choices["target_language"])
-            ).lower()  # TODO: Target language should be variable-based
+            ).lower()
             source_target_pairs.append((source_ngram, target_ngram))
 
     create_csv_file(source_target_pairs, user_choices)
