@@ -170,7 +170,6 @@ class NTransMainGui:
         self.savepath: str = filedialog.askdirectory()  # type: ignore
         if self.savepath:
             self.filepath.set(self.savepath)
-        print(type(self.savepath))
 
     def generate_ntrans_dictionary(self) -> None:
         self.user_choices = {
