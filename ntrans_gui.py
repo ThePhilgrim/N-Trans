@@ -3,6 +3,7 @@ import tkinter
 import tkinter.filedialog
 import functools
 import ntrans
+import threading
 from tkinter import ttk
 
 
@@ -121,7 +122,7 @@ class NTransMainGui:
 
         # Estimated Time
         self.estimated_time_label = ttk.Label(mainframe)
-        self.get_estimated_time()
+        self.update_estimated_time_label()
 
         # About / Help
         about_help_buttonframe = ttk.Frame(mainframe)
@@ -171,10 +172,10 @@ class NTransMainGui:
         # Black turn on formatting
         # fmt: on
 
-        self.select_all_var.trace_add("write", self.get_estimated_time)
-        self.data_size_var.trace_add("write", self.get_estimated_time)
+        self.select_all_var.trace_add("write", self.update_estimated_time_label)
+        self.data_size_var.trace_add("write", self.update_estimated_time_label)
         for var in self.checkbox_vars.values():
-            var.trace_add("write", self.get_estimated_time)
+            var.trace_add("write", self.update_estimated_time_label)
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
@@ -201,7 +202,10 @@ class NTransMainGui:
         # TODO: Check filepath for validity
 
         # Calls logic in ntrans.py
-        ntrans.read_ngram_files(self.user_choices)
+        thread = threading.Thread(
+            target=ntrans.read_ngram_files, args=[self.user_choices]
+        )
+        thread.start()
 
     def open_help_page(self) -> None:
         webbrowser.open_new_tab(
@@ -229,13 +233,12 @@ class NTransMainGui:
             self.select_all_var.set(False)
 
     # *junk is random tcl stuff that trace_add wants in the callback method.
-    def get_estimated_time(self, *junk: object) -> None:
+    def update_estimated_time_label(self, *junk: object) -> None:
         total_time_in_seconds = int(
             self.data_size_var.get()
             * len([n for n, var in self.checkbox_vars.items() if var.get()])
             * 1.2
         )  # The average time taken is 1.2 sec per string translated
-        print(total_time_in_seconds)
         if total_time_in_seconds >= 60:
             if total_time_in_seconds % 60 == 0:
                 self.estimated_time_label[
