@@ -89,6 +89,7 @@ class NTransMainGui:
         )
 
         ngram_data_size["values"] = (
+            50,
             100,
             300,
             500,
@@ -228,13 +229,13 @@ class NTransMainGui:
             self.select_all_var.set(False)
 
     # *junk is random tcl stuff that trace_add wants in the callback method.
-    def get_estimated_time(self, *junk: object) -> str:
-        total_time_in_seconds = (
+    def get_estimated_time(self, *junk: object) -> None:
+        total_time_in_seconds = int(
             self.data_size_var.get()
             * len([n for n, var in self.checkbox_vars.items() if var.get()])
             * 1.2
         )  # The average time taken is 1.2 sec per string translated
-
+        print(total_time_in_seconds)
         if total_time_in_seconds >= 60:
             if total_time_in_seconds % 60 == 0:
                 self.estimated_time_label[
@@ -243,11 +244,11 @@ class NTransMainGui:
             else:
                 self.estimated_time_label[
                     "text"
-                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {int(total_time_in_seconds) % 60} sec"
+                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
         else:
             self.estimated_time_label[
                 "text"
-            ] = f"Estimated time: {int(total_time_in_seconds)} sec"
+            ] = f"Estimated time: {total_time_in_seconds} sec"
 
 
 class AboutWindow:
