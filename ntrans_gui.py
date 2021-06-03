@@ -1,9 +1,7 @@
 import webbrowser
 import tkinter
 import functools
-from tkinter import (
-    filedialog,
-)  # TODO: Figure out why I can't remove this import and use tkinter.filedialog... "self.savepath = tkinter.filedialog.askdirectory()" gives AttributeError: module 'tkinter' has no attribute 'filedialog'
+from tkinter import filedialog
 from tkinter import ttk
 
 
@@ -12,7 +10,7 @@ class NTransMainGui:
     Constitutes the main settings window where the user customize their N-Trans dictionary
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -166,12 +164,12 @@ class NTransMainGui:
         # Black turn on formatting
         # fmt: on
 
-    def get_save_file_path(self) -> None:
-        self.savepath: str = filedialog.askdirectory()  # type: ignore
+    def get_save_file_path(self):
+        self.savepath = filedialog.askdirectory()
         if self.savepath:
             self.filepath.set(self.savepath)
 
-    def generate_ntrans_dictionary(self) -> None:
+    def generate_ntrans_dictionary(self):
         self.user_choices = {
             "save_path": self.filepath.get(),
             "included_ngrams": [
@@ -192,12 +190,12 @@ class NTransMainGui:
 
         # TODO: Call logic Here
 
-    def open_help_page(self) -> None:
+    def open_help_page(self):
         webbrowser.open_new_tab(
             "https://www.google.com"
         )  # TODO: Write help document and link to it
 
-    def select_all_ngrams(self) -> None:
+    def select_all_ngrams(self):
         if self.select_all_var.get():
             for n in self.checkbox_vars:
                 self.checkbox_vars[n].set(True)
@@ -205,13 +203,13 @@ class NTransMainGui:
             for n in self.checkbox_vars:
                 self.checkbox_vars[n].set(False)
 
-    def open_about_window(self) -> None:
+    def open_about_window(self):
         self.about_window = AboutWindow()
 
-    def control_path_validity(self) -> None:
+    def control_path_validity(self):
         pass
 
-    def update_ngram_checkbox(self, n: int) -> None:
+    def update_ngram_checkbox(self, n):
         if self.checkbox_vars[n].get():
             self.checkbox_vars[n].set(True)
         else:
@@ -220,7 +218,7 @@ class NTransMainGui:
 
 
 class AboutWindow:
-    def __init__(self) -> None:
+    def __init__(self):
         self.about_window = tkinter.Toplevel()
         self.about_window.resizable(False, False)
         self.about_window.title("About N-Trans")
