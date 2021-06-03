@@ -176,7 +176,7 @@ class NTransMainGui:
     def generate_ntrans_dictionary(self):
         self.user_choices = {
             "save_path": self.filepath.get(),
-            "included_ngrams": self.user_chosen_ngrams,
+            "included_ngrams": [n for n, var in self.checkbox_vars.items() if var.get()],
             "amount_of_ngrams": self.data_size_var.get(),
             "target_language": self.target_language_var.get(),
         }
