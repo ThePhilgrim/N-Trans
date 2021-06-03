@@ -198,12 +198,8 @@ class NTransMainGui:
         )  # TODO: Write help document and link to it
 
     def select_all_ngrams(self) -> None:
-        if self.select_all_var.get():
-            for n in self.checkbox_vars:
-                self.checkbox_vars[n].set(True)
-        else:
-            for n in self.checkbox_vars:
-                self.checkbox_vars[n].set(False)
+        for var in self.checkbox_vars.values():
+            var.set(self.select_all_var.get())
 
     def open_about_window(self) -> None:
         self.about_window = AboutWindow()
