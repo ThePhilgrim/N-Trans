@@ -6,20 +6,22 @@ These files are generated through ntrans_dataprep.py and processed in ntrans_com
 
 import translatepy  # type: ignore
 import csv
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Any
 
 
 SourceTarget = Tuple[str, str]
 
 
 def create_csv_file(
-    source_target_pairs: List[SourceTarget], save_path: Optional[str] = None
+    source_target_pairs: List[SourceTarget], user_choices: Dict[str, Any]
 ) -> None:
     """
     Writes source/target pairs to a csv-file
     """
 
-    path = "/Users/Writing/Desktop/"  # TODO: Make path depend on user input and use "save_path"
+    path = (
+        user_choices["save_path"] + "/"
+    )  # TODO: Make path depend on user input and use "save_path"
     filename = "ntrans-glossary.csv"  # TODO: Make filename depend on user input
     full_path = path + filename
 
@@ -33,7 +35,9 @@ def create_csv_file(
     return print("N-Trans CSV Glossary has been successfully saved to " + full_path)
 
 
-def machine_translate_ngrams(ngrams: Dict[int, List[str]]) -> None:
+def machine_translate_ngrams(
+    ngrams: Dict[int, List[str]], user_choices: Dict[str, Any]
+) -> None:
     """
     Translates each N-gram and appends the source/target pair to a list.
     """
@@ -45,33 +49,31 @@ def machine_translate_ngrams(ngrams: Dict[int, List[str]]) -> None:
         for enum, source_ngram in enumerate(value, start=1):
             print(f"Translating {key}-gram no. {enum} / {len(value)}")
             target_ngram = str(
-                translator.translate(source_ngram, "Swedish")
+                translator.translate(source_ngram, user_choices["target_language"])
             ).lower()  # TODO: Target language should be variable-based
             source_target_pairs.append((source_ngram, target_ngram))
 
-    create_csv_file(source_target_pairs)
+    create_csv_file(source_target_pairs, user_choices)
 
 
-def read_ngram_files(
-    user_desired_ngrams: List[int] = [2, 3, 4, 5, 6], data_size: int = 500
-) -> None:
+def read_ngram_files(user_choices: Dict[str, Any]) -> None:
     """
     Reads N-gram files depending on which N-grams the user wants to output.
 
     Appends the N-grams to a dict with a size of data_size per N-gram (specified by user).
     """
 
-    ngrams: Dict[int, List[str]] = {n: [] for n in user_desired_ngrams}
+    ngrams: Dict[int, List[str]] = {n: [] for n in user_choices["included_ngrams"]}
 
-    for n in user_desired_ngrams:
+    for n in ngrams:
         with open(f"./ngrams/{n}-grams.csv") as ngram_file:
             read_csv = csv.reader(ngram_file)
             for enum, row in enumerate(read_csv):
-                if enum == data_size:
+                if enum == user_choices["amount_of_ngrams"]:
                     break
                 ngrams[n].append(row[0])
 
-    machine_translate_ngrams(ngrams)
+    machine_translate_ngrams(ngrams, user_choices)
 
 
-read_ngram_files()
+# read_ngram_files()

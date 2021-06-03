@@ -2,6 +2,7 @@ import webbrowser
 import tkinter
 import tkinter.filedialog
 import functools
+import ntrans
 from tkinter import ttk
 
 
@@ -88,6 +89,7 @@ class NTransMainGui:
         )
 
         ngram_data_size["values"] = (
+            5,  # TODO: For testing - Remove before publishing
             100,
             300,
             500,
@@ -188,7 +190,8 @@ class NTransMainGui:
 
         # TODO: Check filepath for validity
 
-        # TODO: Call logic Here
+        # Calls logic in ntrans.py
+        ntrans.read_ngram_files(self.user_choices)
 
     def open_help_page(self) -> None:
         webbrowser.open_new_tab(
@@ -251,6 +254,9 @@ class AboutWindow:
         header.grid(column=0, padx=(0, 0), pady=(20, 20))
         main_text.grid(sticky="W", column=0, padx=(10, 30), pady=(0, 30))
         credit_text.grid(sticky="E", column=0, padx=(0, 30), pady=(30, 10))
+
+
+# TODO: Create progress bar window for when logic is called
 
 
 ntrans_gui = NTransMainGui()
