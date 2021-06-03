@@ -21,7 +21,7 @@ def create_csv_file(
 
     path = (
         user_choices["save_path"] + "/"
-    )  # TODO: Make path depend on user input and use "save_path"
+    )
     filename = "ntrans-glossary.csv"  # TODO: Make filename depend on user input
     full_path = path + filename
 
