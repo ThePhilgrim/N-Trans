@@ -118,6 +118,10 @@ class NTransMainGui:
             style="W.TButton",
         )
 
+        # Estimated Time
+        self.estimated_time_label = ttk.Label(mainframe)
+        self.get_estimated_time()
+
         # About / Help
         about_help_buttonframe = ttk.Frame(mainframe)
 
@@ -153,10 +157,11 @@ class NTransMainGui:
         target_language.grid(sticky="W", column=0, padx=(20, 20), pady=(0, 0))
 
         filepath_label.grid(sticky="W", column=0, padx=(20, 0), pady=(30, 10))
-        show_filepath.grid(sticky="W", column=0, padx=(20, 0), pady=(0, 10))
-        get_savepath_button.grid(sticky="W", column=1, row=13, padx=(0, 20), pady=(0, 10))
+        show_filepath.grid(sticky="W", column=0, padx=(20, 0), pady=(0, 0))
+        get_savepath_button.grid(sticky="W", column=1, row=13, padx=(0, 20), pady=(0, 0))
 
-        generate_dictionary.grid(column=0, columnspan=2, padx=(0, 0), pady=(30, 30))
+        generate_dictionary.grid(column=0, columnspan=2, padx=(0, 0), pady=(0, 0))
+        self.estimated_time_label.grid(sticky="W", column=0, columnspan=2, padx=(30, 0), pady=(0, 0))
 
         about_help_buttonframe.grid(sticky="E", column=0, columnspan=2, padx=(20, 20), pady=(0, 10))
         about_button.pack(side="left")
@@ -164,6 +169,11 @@ class NTransMainGui:
 
         # Black turn on formatting
         # fmt: on
+
+        self.select_all_var.trace_add("write", self.get_estimated_time)
+        self.data_size_var.trace_add("write", self.get_estimated_time)
+        for var in self.checkbox_vars.values():
+            var.trace_add("write", self.get_estimated_time)
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
@@ -216,6 +226,28 @@ class NTransMainGui:
 
         if not self.checkbox_vars[n].get():
             self.select_all_var.set(False)
+
+    # *junk is random tcl stuff that trace_add wants in the callback method.
+    def get_estimated_time(self, *junk: object) -> str:
+        total_time_in_seconds = (
+            self.data_size_var.get()
+            * len([n for n, var in self.checkbox_vars.items() if var.get()])
+            * 1.2
+        )  # The average time taken is 1.2 sec per string translated
+
+        if total_time_in_seconds >= 60:
+            if total_time_in_seconds % 60 == 0:
+                self.estimated_time_label[
+                    "text"
+                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min"
+            else:
+                self.estimated_time_label[
+                    "text"
+                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {int(total_time_in_seconds) % 60} sec"
+        else:
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated time: {int(total_time_in_seconds)} sec"
 
 
 class AboutWindow:
