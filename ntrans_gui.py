@@ -11,8 +11,6 @@ class NTransMainGui:
     """
 
     def __init__(self):
-        self.user_chosen_ngrams = [2, 3, 4, 5, 6]
-
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -174,7 +172,9 @@ class NTransMainGui:
     def generate_ntrans_dictionary(self):
         self.user_choices = {
             "save_path": self.filepath.get(),
-            "included_ngrams": [n for n, var in self.checkbox_vars.items() if var.get()],
+            "included_ngrams": [
+                n for n, var in self.checkbox_vars.items() if var.get()
+            ],
             "amount_of_ngrams": self.data_size_var.get(),
             "target_language": self.target_language_var.get(),
         }
@@ -199,15 +199,9 @@ class NTransMainGui:
         if self.select_all_var.get():
             for n in self.checkbox_vars:
                 self.checkbox_vars[n].set(True)
-
-            for n in range(2, 7):
-                if n not in self.user_chosen_ngrams:
-                    self.user_chosen_ngrams.append(n)
         else:
             for n in self.checkbox_vars:
                 self.checkbox_vars[n].set(False)
-
-            self.user_chosen_ngrams.clear()
 
     def open_about_window(self):
         self.about_window = AboutWindow()
@@ -218,11 +212,9 @@ class NTransMainGui:
     def update_ngram_checkbox(self, n):
         if self.checkbox_vars[n].get():
             self.checkbox_vars[n].set(True)
-            self.user_chosen_ngrams.append(n)
         else:
             self.checkbox_vars[n].set(False)
             self.select_all_var.set(False)
-            self.user_chosen_ngrams.remove(n)
 
 
 class AboutWindow:
