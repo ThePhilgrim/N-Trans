@@ -89,7 +89,6 @@ class NTransMainGui:
         )
 
         ngram_data_size["values"] = (
-            5,  # TODO: For testing - Remove before publishing
             100,
             300,
             500,
