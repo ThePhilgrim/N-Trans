@@ -138,6 +138,18 @@ class NTransMainGui:
             about_help_buttonframe, command=self.open_help_page, text="Help"
         )
 
+        about_button.pack(side="left")
+        help_button.pack(side="right")
+
+        # Progress Indication
+        self.progress_frame = ttk.Frame(mainframe)
+        self.progress_indicator = ProgressIndicator(self.progress_frame)
+
+        self.progress_indicator.progress_bar.grid(column=0, row=0, padx=(0, 0), pady=(0, 0))
+        self.progress_indicator.percentage_label.grid(column=1, row=0, padx=(0, 0), pady=(0, 0))
+        self.progress_indicator.translator_progress_label.grid(column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 20))
+        self.progress_indicator.cancel_button.grid(column=0, row=2, columnspan=2, padx=(0, 0), pady=(0, 0))
+
         # Black turn off formatting
         # fmt: off
 
@@ -166,9 +178,7 @@ class NTransMainGui:
         generate_dictionary.grid(column=0, columnspan=2, padx=(0, 0), pady=(0, 0))
         self.estimated_time_label.grid(sticky="W", column=0, columnspan=2, padx=(30, 0), pady=(0, 0))
 
-        about_help_buttonframe.grid(sticky="E", column=0, columnspan=2, padx=(20, 20), pady=(0, 10))
-        about_button.pack(side="left")
-        help_button.pack(side="right")
+        about_help_buttonframe.grid(sticky="E", column=0, row=17, columnspan=2, padx=(20, 20), pady=(20, 10))
 
         # Black turn on formatting
         # fmt: on
@@ -210,15 +220,14 @@ class NTransMainGui:
         self.open_progress_bar()
 
     def open_progress_bar(self):
-        self.progress_bar = ProgressBar()
+        self.estimated_time_label.grid_remove()
+        self.progress_frame.grid(column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40))
         self.check_progressbar_queue()
 
     def check_progressbar_queue(self):
         try:
             current_percentage = self.progress_queue.get(block=False)
-            print(str(current_percentage))
-            self.progress_bar.update_progressbar_value(current_percentage)
-            print("CALLED UPDATE PROGRESS BAR")
+            self.progress_indicator.update_progressbar_value(current_percentage)
         except queue.Empty:
             pass
 
@@ -262,30 +271,24 @@ class NTransMainGui:
             self.estimated_time_label['text'] = f"Estimated time: {total_time_in_seconds} sec"
 
 
-class ProgressBar:
-    def __init__(self) -> None:
-        self.progressbar_window = tkinter.Toplevel()
-        self.progressbar_window.resizable(False, False)
-        self.progressbar_window.title("N-Trans")
-        self.progressbar_window.geometry("300x500+700+300")  # TODO: Open center of monitor
-        self.progressbar_window.update_idletasks()
-        self.progressbar_window.overrideredirect(True)
+class ProgressIndicator:
+    def __init__(self, parent_frame) -> None:
+        self.progress_bar = ttk.Progressbar(parent_frame, length=250, orient="horizontal", mode='determinate')
 
-        mainframe = ttk.Frame(self.progressbar_window)
-        mainframe.pack(fill="both", expand=True)
+        self.percentage_label = ttk.Label(parent_frame, text="50%")
 
-        self.progress_bar = ttk.Progressbar(mainframe, length=250, orient="horizontal", mode='determinate')
-        self.progress_bar.pack()
+        self.translator_progress_label = ttk.Label(parent_frame, text="Translating N-Gram X of 5000")
 
-        percentage_label = ttk.Label(mainframe, text="50%")
-        percentage_label.pack()
-
-        cancel_button = ttk.Button(mainframe, text="Cancel")
-        cancel_button.pack()
+        self.cancel_button = ttk.Button(parent_frame, text="Cancel")
 
     def update_progressbar_value(self, current_percentage):
-        print("Setting progress bar to " + str(current_percentage))
         self.progress_bar['value'] = current_percentage
+
+    def update_progress_label(self, current_percentage):
+        pass
+
+    def cancel_generation(self):
+        pass
 
 
 class AboutWindow:
