@@ -220,7 +220,7 @@ class NTransMainGui:
             self.progress_bar.update_progressbar_value(current_percentage)
             print("CALLED UPDATE PROGRESS BAR")
         except queue.Empty:
-            self.root.after(100, self.check_progressbar_queue)
+            pass
 
         if self.thread.is_alive():
             self.root.after(100, self.check_progressbar_queue)
