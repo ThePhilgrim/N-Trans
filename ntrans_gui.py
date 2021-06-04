@@ -193,7 +193,7 @@ class NTransMainGui:
             self.filepath.set(savepath)
 
     def generate_ntrans_dictionary(self) -> None:
-        self.user_choices = {
+        user_choices = {
             "save_path": self.filepath.get(),
             "included_ngrams": [
                 n for n, var in self.checkbox_vars.items() if var.get()
@@ -202,8 +202,8 @@ class NTransMainGui:
             "target_language": self.target_language_var.get(),
         }
 
-        for key in self.user_choices:
-            if not self.user_choices[key]:
+        for key in user_choices:
+            if not user_choices[key]:
                 print(
                     "All fields need to be filled in before generating the N-Trans dictionary."
                 )  # TODO: Change print to label
@@ -213,7 +213,7 @@ class NTransMainGui:
 
         self.progress_queue = queue.Queue()
         # Calls logic in ntrans.py
-        self.thread = threading.Thread(target=ntrans.read_ngram_files, args=[self.user_choices, self.progress_queue])
+        self.thread = threading.Thread(target=ntrans.read_ngram_files, args=[user_choices, self.progress_queue])
         self.thread.start()
 
         self.open_progress_bar()
