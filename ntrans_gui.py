@@ -210,11 +210,11 @@ class NTransMainGui:
                 break
 
         # TODO: Check filepath for validity
-
-        self.progress_queue = queue.Queue()
-        # Calls logic in ntrans.py
-        self.thread = threading.Thread(target=ntrans.read_ngram_files, args=[user_choices, self.progress_queue])
-        self.thread.start()
+        if not hasattr(ntrans_gui, 'thread'):
+            self.progress_queue = queue.Queue()
+            # Calls logic in ntrans.py
+            self.thread = threading.Thread(target=ntrans.read_ngram_files, args=[user_choices, self.progress_queue])
+            self.thread.start()
 
         self.open_progress_bar()
 
