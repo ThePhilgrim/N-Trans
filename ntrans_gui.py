@@ -4,6 +4,7 @@ import tkinter.filedialog
 import functools
 import ntrans
 import threading
+import queue
 from tkinter import ttk
 
 
@@ -172,10 +173,10 @@ class NTransMainGui:
         # Black turn on formatting
         # fmt: on
 
-        self.select_all_var.trace_add("write", self.update_estimated_time_label)
-        self.data_size_var.trace_add("write", self.update_estimated_time_label)
+        self.select_all_var.trace_add('write', self.update_estimated_time_label)
+        self.data_size_var.trace_add('write', self.update_estimated_time_label)
         for var in self.checkbox_vars.values():
-            var.trace_add("write", self.update_estimated_time_label)
+            var.trace_add('write', self.update_estimated_time_label)
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
@@ -201,16 +202,28 @@ class NTransMainGui:
 
         # TODO: Check filepath for validity
 
+        self.progress_queue = queue.Queue()
         # Calls logic in ntrans.py
-        thread = threading.Thread(
-            target=ntrans.read_ngram_files, args=[self.user_choices]
-        )
-        thread.start()
+        self.thread = threading.Thread(target=ntrans.read_ngram_files, args=[self.user_choices, self.progress_queue])
+        self.thread.start()
 
-    def open_help_page(self) -> None:
-        webbrowser.open_new_tab(
-            "https://www.google.com"
-        )  # TODO: Write help document and link to it
+        self.open_progress_bar()
+
+    def open_progress_bar(self):
+        self.progress_bar = ProgressBar()
+        self.check_progressbar_queue()
+
+    def check_progressbar_queue(self):
+        try:
+            current_percentage = self.progress_queue.get(block=False)
+            print(str(current_percentage))
+            self.progress_bar.update_progressbar_value(current_percentage)
+            print("CALLED UPDATE PROGRESS BAR")
+        except queue.Empty:
+            self.root.after(100, self.check_progressbar_queue)
+
+        if self.thread.is_alive():
+            self.root.after(100, self.check_progressbar_queue)
 
     def select_all_ngrams(self) -> None:
         if self.select_all_var.get():
@@ -223,6 +236,11 @@ class NTransMainGui:
     def open_about_window(self) -> None:
         self.about_window = AboutWindow()
 
+    def open_help_page(self) -> None:
+        webbrowser.open_new_tab(
+            "https://www.google.com"
+        )  # TODO: Write help document and link to it
+
     def control_path_validity(self) -> None:
         pass
 
@@ -234,24 +252,40 @@ class NTransMainGui:
 
     # *junk is random tcl stuff that trace_add wants in the callback method.
     def update_estimated_time_label(self, *junk: object) -> None:
-        total_time_in_seconds = int(
-            self.data_size_var.get()
-            * len([n for n, var in self.checkbox_vars.items() if var.get()])
-            * 1.2
-        )  # The average time taken is 1.2 sec per string translated
+        total_time_in_seconds = int(self.data_size_var.get() * len([n for n, var in self.checkbox_vars.items() if var.get()]) * 1.2)  # The average time taken is 1.2 sec per string translated
         if total_time_in_seconds >= 60:
             if total_time_in_seconds % 60 == 0:
-                self.estimated_time_label[
-                    "text"
-                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min"
+                self.estimated_time_label['text'] = f"Estimated time: {int(total_time_in_seconds / 60)} min"
             else:
-                self.estimated_time_label[
-                    "text"
-                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
+                self.estimated_time_label['text'] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
         else:
-            self.estimated_time_label[
-                "text"
-            ] = f"Estimated time: {total_time_in_seconds} sec"
+            self.estimated_time_label['text'] = f"Estimated time: {total_time_in_seconds} sec"
+
+
+class ProgressBar:
+    def __init__(self) -> None:
+        self.progressbar_window = tkinter.Toplevel()
+        self.progressbar_window.resizable(False, False)
+        self.progressbar_window.title("N-Trans")
+        self.progressbar_window.geometry("300x500+700+300")  # TODO: Open center of monitor
+        self.progressbar_window.update_idletasks()
+        self.progressbar_window.overrideredirect(True)
+
+        mainframe = ttk.Frame(self.progressbar_window)
+        mainframe.pack(fill="both", expand=True)
+
+        self.progress_bar = ttk.Progressbar(mainframe, length=250, orient="horizontal", mode='determinate')
+        self.progress_bar.pack()
+
+        percentage_label = ttk.Label(mainframe, text="50%")
+        percentage_label.pack()
+
+        cancel_button = ttk.Button(mainframe, text="Cancel")
+        cancel_button.pack()
+
+    def update_progressbar_value(self, current_percentage):
+        print("Setting progress bar to " + str(current_percentage))
+        self.progress_bar['value'] = current_percentage
 
 
 class AboutWindow:
