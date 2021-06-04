@@ -46,7 +46,6 @@ def machine_translate_ngrams(ngrams: Dict[int, List[str]], user_choices: Dict[st
 
     for key, value in ngrams.items():
         for enum, source_ngram in enumerate(value, start=1):
-            print(f"translating {len(source_target_pairs) + 1} of {total_translations}")
             target_ngram = str(
                 translator.translate(source_ngram, user_choices["target_language"])
             ).lower()

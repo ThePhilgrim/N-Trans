@@ -146,9 +146,8 @@ class NTransMainGui:
         self.progress_indicator = ProgressIndicator(self.progress_frame)
 
         self.progress_indicator.progress_bar.grid(column=0, row=0, padx=(0, 0), pady=(0, 0))
-        self.progress_indicator.percentage_label.grid(column=1, row=0, padx=(0, 0), pady=(0, 0))
-        self.progress_indicator.translator_progress_label.grid(column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 20))
-        self.progress_indicator.cancel_button.grid(column=0, row=2, columnspan=2, padx=(0, 0), pady=(0, 0))
+        self.progress_indicator.percentage_label.grid(column=1, row=0, padx=(5, 0), pady=(0, 0))
+        self.progress_indicator.cancel_button.grid(column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0))
 
         # Black turn off formatting
         # fmt: off
@@ -227,7 +226,7 @@ class NTransMainGui:
     def check_progressbar_queue(self):
         try:
             current_percentage = self.progress_queue.get(block=False)
-            self.progress_indicator.update_progressbar_value(current_percentage)
+            self.progress_indicator.update_progress_value(current_percentage)
         except queue.Empty:
             pass
 
@@ -275,14 +274,13 @@ class ProgressIndicator:
     def __init__(self, parent_frame) -> None:
         self.progress_bar = ttk.Progressbar(parent_frame, length=250, orient="horizontal", mode='determinate')
 
-        self.percentage_label = ttk.Label(parent_frame, text="50%")
-
-        self.translator_progress_label = ttk.Label(parent_frame, text="Translating N-Gram X of 5000")
+        self.percentage_label = ttk.Label(parent_frame)
 
         self.cancel_button = ttk.Button(parent_frame, text="Cancel")
 
-    def update_progressbar_value(self, current_percentage):
+    def update_progress_value(self, current_percentage):
         self.progress_bar['value'] = current_percentage
+        self.percentage_label['text'] = str(current_percentage) + "%"
 
     def update_progress_label(self, current_percentage):
         pass
