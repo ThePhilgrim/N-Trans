@@ -145,9 +145,15 @@ class NTransMainGui:
         self.progress_frame = ttk.Frame(mainframe)
         self.progress_indicator = ProgressIndicator(self.progress_frame)
 
-        self.progress_indicator.progress_bar.grid(column=0, row=0, padx=(0, 0), pady=(0, 0))
-        self.progress_indicator.percentage_label.grid(column=1, row=0, padx=(5, 0), pady=(0, 0))
-        self.progress_indicator.cancel_button.grid(column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0))
+        self.progress_indicator.progress_bar.grid(
+            column=0, row=0, padx=(0, 0), pady=(0, 0)
+        )
+        self.progress_indicator.percentage_label.grid(
+            column=1, row=0, padx=(5, 0), pady=(0, 0)
+        )
+        self.progress_indicator.cancel_button.grid(
+            column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
+        )
 
         # Black turn off formatting
         # fmt: off
@@ -182,10 +188,10 @@ class NTransMainGui:
         # Black turn on formatting
         # fmt: on
 
-        self.select_all_var.trace_add('write', self.update_estimated_time_label)
-        self.data_size_var.trace_add('write', self.update_estimated_time_label)
+        self.select_all_var.trace_add("write", self.update_estimated_time_label)
+        self.data_size_var.trace_add("write", self.update_estimated_time_label)
         for var in self.checkbox_vars.values():
-            var.trace_add('write', self.update_estimated_time_label)
+            var.trace_add("write", self.update_estimated_time_label)
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
@@ -210,17 +216,21 @@ class NTransMainGui:
                 break
 
         # TODO: Check filepath for validity
-        if not hasattr(ntrans_gui, 'thread'):
+        if not hasattr(ntrans_gui, "thread"):
             self.progress_queue = queue.Queue()
             # Calls logic in ntrans.py
-            self.thread = threading.Thread(target=ntrans.read_ngram_files, args=[user_choices, self.progress_queue])
+            self.thread = threading.Thread(
+                target=ntrans.read_ngram_files, args=[user_choices, self.progress_queue]
+            )
             self.thread.start()
 
         self.open_progress_bar()
 
     def open_progress_bar(self):
         self.estimated_time_label.grid_remove()
-        self.progress_frame.grid(column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40))
+        self.progress_frame.grid(
+            column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
+        )
         self.check_progressbar_queue()
 
     def check_progressbar_queue(self):
@@ -232,6 +242,8 @@ class NTransMainGui:
 
         if self.thread.is_alive():
             self.root.after(100, self.check_progressbar_queue)
+        else:
+            self.progress_frame.grid_remove()
 
     def select_all_ngrams(self) -> None:
         if self.select_all_var.get():
@@ -260,27 +272,39 @@ class NTransMainGui:
 
     # *junk is random tcl stuff that trace_add wants in the callback method.
     def update_estimated_time_label(self, *junk: object) -> None:
-        total_time_in_seconds = int(self.data_size_var.get() * len([n for n, var in self.checkbox_vars.items() if var.get()]) * 1.2)  # The average time taken is 1.2 sec per string translated
+        total_time_in_seconds = int(
+            self.data_size_var.get()
+            * len([n for n, var in self.checkbox_vars.items() if var.get()])
+            * 1.2
+        )  # The average time taken is 1.2 sec per string translated
         if total_time_in_seconds >= 60:
             if total_time_in_seconds % 60 == 0:
-                self.estimated_time_label['text'] = f"Estimated time: {int(total_time_in_seconds / 60)} min"
+                self.estimated_time_label[
+                    "text"
+                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min"
             else:
-                self.estimated_time_label['text'] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
+                self.estimated_time_label[
+                    "text"
+                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
         else:
-            self.estimated_time_label['text'] = f"Estimated time: {total_time_in_seconds} sec"
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated time: {total_time_in_seconds} sec"
 
 
 class ProgressIndicator:
     def __init__(self, parent_frame) -> None:
-        self.progress_bar = ttk.Progressbar(parent_frame, length=250, orient="horizontal", mode='determinate')
+        self.progress_bar = ttk.Progressbar(
+            parent_frame, length=250, orient="horizontal", mode="determinate"
+        )
 
         self.percentage_label = ttk.Label(parent_frame)
 
         self.cancel_button = ttk.Button(parent_frame, text="Cancel")
 
     def update_progress_value(self, current_percentage):
-        self.progress_bar['value'] = current_percentage
-        self.percentage_label['text'] = str(current_percentage) + "%"
+        self.progress_bar["value"] = current_percentage
+        self.percentage_label["text"] = str(current_percentage) + "%"
 
     def update_progress_label(self, current_percentage):
         pass
