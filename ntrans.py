@@ -3,7 +3,7 @@ The usage of this script relies on the N-gram files in "./ngrams"
 
 These files are generated through ntrans_dataprep.py and processed in ntrans_combine.py
 """
-
+from __future__ import annotations
 import translatepy  # type: ignore
 import csv
 import queue

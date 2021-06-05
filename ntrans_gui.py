@@ -145,16 +145,6 @@ class NTransMainGui:
         self.progress_frame = ttk.Frame(mainframe)
         self.progress_indicator = ProgressIndicator(self.progress_frame)
 
-        self.progress_indicator.progress_bar.grid(
-            column=0, row=0, padx=(0, 0), pady=(0, 0)
-        )
-        self.progress_indicator.percentage_label.grid(
-            column=1, row=0, padx=(5, 0), pady=(0, 0)
-        )
-        # self.progress_indicator.cancel_button.grid(
-        #     column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
-        # )  # TODO: Add cancel button to progress frame
-
         # Black turn off formatting
         # fmt: off
 
@@ -213,10 +203,10 @@ class NTransMainGui:
                 print(
                     "All fields need to be filled in before generating the N-Trans dictionary."
                 )  # TODO: Change print to label
-                break
+                break  # TODO: break needs to change to `return`. Will be fixed in #23
 
         # TODO: Check filepath for validity
-        if not hasattr(ntrans_gui, "thread"):
+        if not hasattr(self, "thread"):
             self.progress_queue: queue.Queue[int] = queue.Queue()
             # Calls logic in ntrans.py
             self.thread = threading.Thread(
@@ -224,14 +214,11 @@ class NTransMainGui:
             )
             self.thread.start()
 
-        self.open_progress_bar()
-
-    def open_progress_bar(self) -> None:
-        self.estimated_time_label.grid_remove()
-        self.progress_frame.grid(
-            column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
-        )
-        self.check_progressbar_queue()
+            self.estimated_time_label.grid_remove()
+            self.progress_frame.grid(
+                column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
+            )
+            self.check_progressbar_queue()
 
     def check_progressbar_queue(self) -> None:
         try:
@@ -261,7 +248,9 @@ class NTransMainGui:
             "https://www.google.com"
         )  # TODO: Write help document and link to it
 
-    def control_path_validity(self) -> None:
+    def control_path_validity(
+        self,
+    ) -> None:  # TODO: Add logic to make sure the save path is a valid path.
         pass
 
     def update_ngram_checkbox(self, n: int) -> None:
@@ -302,14 +291,24 @@ class ProgressIndicator:
 
         self.cancel_button = ttk.Button(parent_frame, text="Cancel")
 
+        self.progress_bar.grid(column=0, row=0, padx=(0, 0), pady=(0, 0))
+        self.percentage_label.grid(column=1, row=0, padx=(5, 0), pady=(0, 0))
+        # self.cancel_button.grid(
+        #     column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
+        # )  # TODO: Add cancel button to progress frame
+
     def update_progress_value(self, current_percentage: int) -> None:
         self.progress_bar["value"] = current_percentage
         self.percentage_label["text"] = str(current_percentage) + "%"
 
-    def update_progress_label(self, current_percentage: int) -> None:
+    def update_progress_label(
+        self, current_percentage: int
+    ) -> None:  # TODO: Add logic to update percentage label. Will be fixed in #23
         pass
 
-    def cancel_generation(self) -> None:
+    def cancel_generation(
+        self,
+    ) -> None:  # TODO: Cancel button will stop the generation of N-Trans dictionary.
         pass
 
 
