@@ -6,6 +6,7 @@ import ntrans
 import threading
 import queue
 from tkinter import ttk
+from typing import Optional
 
 
 class NTransMainGui:
@@ -14,7 +15,7 @@ class NTransMainGui:
     """
 
     def __init__(self) -> None:
-        self.thread = None
+        self.thread: Optional[threading.Thread] = None
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -228,7 +229,7 @@ class NTransMainGui:
         except queue.Empty:
             pass
 
-        if self.thread.is_alive():
+        if self.thread is not None:
             self.root.after(100, self.check_progressbar_queue)
         else:
             self.progress_frame.grid_remove()
