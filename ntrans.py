@@ -3,7 +3,7 @@ The usage of this script relies on the N-gram files in "./ngrams"
 
 These files are generated through ntrans_dataprep.py and processed in ntrans_combine.py
 """
-
+from __future__ import annotations
 import translatepy  # type: ignore
 import csv
 import queue
@@ -34,7 +34,11 @@ def create_csv_file(
     return print("N-Trans CSV Glossary has been successfully saved to " + full_path)
 
 
-def machine_translate_ngrams(ngrams: Dict[int, List[str]], user_choices: Dict[str, Any], progress_queue: queue.Queue[float]) -> None:
+def machine_translate_ngrams(
+    ngrams: Dict[int, List[str]],
+    user_choices: Dict[str, Any],
+    progress_queue: queue.Queue[int],
+) -> None:
     """
     Translates each N-gram and appends the source/target pair to a list.
     """
@@ -42,7 +46,9 @@ def machine_translate_ngrams(ngrams: Dict[int, List[str]], user_choices: Dict[st
 
     translator = translatepy.Translator()
 
-    total_translations = len(user_choices["included_ngrams"]) * user_choices["amount_of_ngrams"]
+    total_translations = (
+        len(user_choices["included_ngrams"]) * user_choices["amount_of_ngrams"]
+    )
 
     for key, value in ngrams.items():
         for enum, source_ngram in enumerate(value, start=1):
@@ -55,7 +61,9 @@ def machine_translate_ngrams(ngrams: Dict[int, List[str]], user_choices: Dict[st
     create_csv_file(source_target_pairs, user_choices)
 
 
-def read_ngram_files(user_choices: Dict[str, Any], progress_queue: queue.Queue[float]) -> None:
+def read_ngram_files(
+    user_choices: Dict[str, Any], progress_queue: queue.Queue[int]
+) -> None:
     """
     Reads N-gram files depending on which N-grams the user wants to output.
 

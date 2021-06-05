@@ -6,6 +6,7 @@ import ntrans
 import threading
 import queue
 from tkinter import ttk
+from typing import Optional
 
 
 class NTransMainGui:
@@ -14,6 +15,7 @@ class NTransMainGui:
     """
 
     def __init__(self) -> None:
+        self.thread: Optional[threading.Thread] = None
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -254,7 +256,7 @@ class NTransMainGui:
                 return
 
         # TODO: Check filepath for validity
-        if not hasattr(ntrans_gui, "thread"):
+        if self.thread is None:
             self.progress_queue = queue.Queue()
             # Calls logic in ntrans.py
             self.thread = threading.Thread(
@@ -263,9 +265,6 @@ class NTransMainGui:
             )
             self.thread.start()
 
-        self.open_progress_bar()
-
-    def open_progress_bar(self):
         self.estimated_time_label.grid_remove()
         self.progress_frame.grid(
             column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
@@ -279,18 +278,19 @@ class NTransMainGui:
         except queue.Empty:
             pass
 
-        if self.thread.is_alive():
+        if self.thread is not None:
+            self.root.after(100, self.check_progressbar_queue)
+        else:
+            self.progress_frame.grid_remove()
+
+        if self.thread is not None:
             self.root.after(100, self.check_progressbar_queue)
         else:
             self.progress_frame.grid_remove()
 
     def select_all_ngrams(self) -> None:
-        if self.select_all_var.get():
-            for n in self.checkbox_vars:
-                self.checkbox_vars[n].set(True)
-        else:
-            for n in self.checkbox_vars:
-                self.checkbox_vars[n].set(False)
+        for var in self.checkbox_vars.values():
+            var.set(self.select_all_var.get())
 
     def open_about_window(self) -> None:
         self.about_window = AboutWindow()
@@ -300,7 +300,9 @@ class NTransMainGui:
             "https://www.google.com"
         )  # TODO: Write help document and link to it
 
-    def control_path_validity(self) -> None:
+    def control_path_validity(
+        self,
+    ) -> None:  # TODO: Add logic to make sure the save path is a valid path.
         pass
 
     def update_ngram_checkbox(self, n: int) -> None:
@@ -315,7 +317,7 @@ class NTransMainGui:
             self.data_size_var.get()
             * len([n for n, var in self.checkbox_vars.items() if var.get()])
             * 1.2
-        )  # The average time taken is 1.2 sec per string translated
+        )  # Average time in seconds per N-gram
         if total_time_in_seconds >= 60 * 60:
             self.estimated_time_label[
                 "text"
@@ -345,15 +347,12 @@ class ProgressIndicator:
 
         self.cancel_button = ttk.Button(parent_frame, text="Cancel")
 
-    def update_progress_value(self, current_percentage):
+    def update_progress_value(self, current_percentage: int) -> None:
         self.progress_bar["value"] = current_percentage
         self.percentage_label["text"] = str(current_percentage) + "%"
 
-    def update_progress_label(self, current_percentage):
-        pass
-
-    def cancel_generation(self):
-        pass
+    def cancel_generation(self) -> None:  # TODO: Cancel button will stop the generation of N-Trans dictionary.
+        ntrans_gui.thread = None
 
 
 class AboutWindow:
