@@ -67,13 +67,7 @@ def combine_chunkfiles_into_counter() -> None:
     of each N-gram.
     """
 
-    ngram_counter: Dict[int, List[NGramCounter]] = {
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-    }
+    ngram_counter: Dict[int, List[NGramCounter]] = {2: [], 3: [], 4: [], 5: [], 6: []}
 
     path_datachunks = pathlib.Path(("./ngram_data_chunks"))
 
