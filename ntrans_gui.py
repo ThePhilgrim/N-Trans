@@ -264,8 +264,8 @@ class NTransMainGui:
         total_time_in_seconds = int(
             self.data_size_var.get()
             * len([n for n, var in self.checkbox_vars.items() if var.get()])
-            * 1.2
-        )  # The average time taken is 1.2 sec per string translated
+            * 1.2  # Average time, sec per string
+        )
         if total_time_in_seconds >= 60:
             if total_time_in_seconds % 60 == 0:
                 self.estimated_time_label[
