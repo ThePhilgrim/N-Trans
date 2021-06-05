@@ -55,7 +55,6 @@ def machine_translate_ngrams(
     for key, value in ngrams.items():
         for enum, source_ngram in enumerate(value, start=1):
             if cancel_thread_event.is_set():
-                print("STOPPING!!!")
                 return
             target_ngram = str(
                 translator.translate(source_ngram, user_choices["target_language"])
