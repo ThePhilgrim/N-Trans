@@ -14,6 +14,7 @@ class NTransMainGui:
     """
 
     def __init__(self) -> None:
+        self.thread = None
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -206,7 +207,7 @@ class NTransMainGui:
                 break  # TODO: break needs to change to `return`. Will be fixed in #23
 
         # TODO: Check filepath for validity
-        if not hasattr(self, "thread"):
+        if self.thread is None:
             self.progress_queue: queue.Queue[int] = queue.Queue()
             # Calls logic in ntrans.py
             self.thread = threading.Thread(
@@ -309,7 +310,7 @@ class ProgressIndicator:
     def cancel_generation(
         self,
     ) -> None:  # TODO: Cancel button will stop the generation of N-Trans dictionary.
-        pass
+        pass  # Needs to set ntrans_gui.thread = None
 
 
 class AboutWindow:
