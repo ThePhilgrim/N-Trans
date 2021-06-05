@@ -6,6 +6,7 @@ import ntrans
 import threading
 import queue
 import time
+import datetime
 from tkinter import ttk
 from typing import Optional
 
@@ -304,23 +305,23 @@ class NTransMainGui:
             * len([n for n, var in self.checkbox_vars.items() if var.get()])
             * 1.2
         )  # Average time in seconds per N-gram
-        if total_time_in_seconds >= 60 * 60:
+
+        formatted_time = str(datetime.timedelta(seconds=total_time_in_seconds))
+        time_split = formatted_time.split(":")  # format h:mm:ss
+        if time_split[0] != "0":
             self.estimated_time_label[
                 "text"
-            ] = f"Estimated run time: {int(total_time_in_seconds / 60 / 60)} h & {int(total_time_in_seconds / 60 % 60)} min"
-        elif total_time_in_seconds >= 60:
-            if total_time_in_seconds % 60 == 0:
-                self.estimated_time_label[
-                    "text"
-                ] = f"Estimated run time: {int(total_time_in_seconds / 60)} min"
-            else:
-                self.estimated_time_label[
-                    "text"
-                ] = f"Estimated run time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
+            ] = f"Estimated run time: {time_split[0]} h & {time_split[1]} min."
+        elif time_split[1] != "00" and int(time_split[1]) < 10:
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated run time: {(int(time_split[1]))} min."
+        elif time_split[1] != "00":
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated run time: {time_split[1]} min."
         else:
-            self.estimated_time_label[
-                "text"
-            ] = f"Estimated run time: {total_time_in_seconds} sec"
+            self.estimated_time_label["text"] = "Estimated run time: --"
 
     def cancel_generation(self) -> None:
         self.cancel_thread_event.set()
