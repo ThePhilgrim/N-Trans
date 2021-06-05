@@ -277,7 +277,6 @@ class NTransMainGui:
 
         self.cancel_thread_event.clear()
 
-        # TODO: Check filepath for validity
         if self.thread is None:
             self.progress_queue: queue.Queue[int] = queue.Queue()
             # Calls logic in ntrans.py
@@ -378,9 +377,6 @@ class AboutWindow:
         header.grid(column=0, padx=(0, 0), pady=(20, 20))
         main_text.grid(sticky="W", column=0, padx=(10, 30), pady=(0, 30))
         credit_text.grid(sticky="E", column=0, padx=(0, 30), pady=(30, 10))
-
-
-# TODO: Create progress bar window for when logic is called
 
 
 ntrans_gui = NTransMainGui()
