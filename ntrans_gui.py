@@ -27,9 +27,7 @@ class NTransMainGui:
         mainframe.pack(fill="both", expand=True)
 
         header = ttk.Label(
-            mainframe,
-            text="N-Trans Dictionary Settings",
-            font=("TkDefaultFont", 18),
+            mainframe, text="N-Trans Dictionary Settings", font=("TkDefaultFont", 18)
         )
 
         # Get directory path to save csv file
@@ -112,10 +110,7 @@ class NTransMainGui:
         # Generate Button
         self.style_options = ttk.Style()
         self.style_options.configure(
-            "W.TButton",
-            font=("TkDefaultFont", 16),
-            foreground="yellow",
-            padding=30,
+            "W.TButton", font=("TkDefaultFont", 16), foreground="yellow", padding=30
         )
 
         self.style_options.configure("W.TLabel", foreground="red")
@@ -249,6 +244,8 @@ class NTransMainGui:
                 self.flash_warning_label()
                 return
 
+        self.cancel_thread_event.clear()
+
         # TODO: Check filepath for validity
         if self.thread is None:
             self.progress_queue: queue.Queue[int] = queue.Queue()
@@ -328,7 +325,6 @@ class NTransMainGui:
     def cancel_generation(self) -> None:
         self.cancel_thread_event.set()
         self.thread = None
-        self.cancel_thread_event.clear()
 
 
 class ProgressIndicator:
