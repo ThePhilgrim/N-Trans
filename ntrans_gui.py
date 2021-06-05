@@ -5,6 +5,7 @@ import functools
 import ntrans
 import threading
 import queue
+import time
 from tkinter import ttk
 from typing import Optional
 
@@ -113,7 +114,6 @@ class NTransMainGui:
             "W.TButton",
             font=("TkDefaultFont", 16),
             foreground="yellow",
-            background="black",
             padding=30,
         )
 
@@ -207,10 +207,14 @@ class NTransMainGui:
         self.update_estimated_time_label()
 
     def flash_warning_label(self) -> None:
-        # print("In flashing method")
-        # self.style_options.configure("W.TLabel", foreground="white")
+        for flash in range(3):
+            self.style_options.configure("W.TLabel", foreground="orange")
+            self.root.update()  # type: ignore
+            time.sleep(0.07)
+            self.style_options.configure("W.TLabel", foreground="red")
+            self.root.update()  # type: ignore
+            time.sleep(0.07)
         # self.style_options.configure("W.TLabel", foreground="red")
-        pass  # TODO: style.configure doesn't work.
 
     def update_user_choice_vars(self, *junk: object) -> None:
         if not (
