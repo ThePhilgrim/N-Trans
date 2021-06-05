@@ -106,14 +106,17 @@ class NTransMainGui:
         ngram_data_size.current(6)
 
         # Generate Button
-        generate_button_style = ttk.Style()
-        generate_button_style.configure(
+        self.style_options = ttk.Style()
+        self.style_options.configure(
             "W.TButton",
             font=("TkDefaultFont", 16),
             foreground="yellow",
             background="black",
             padding=30,
         )
+
+        self.style_options.configure("W.TLabel", foreground="red")
+
         generate_dictionary = ttk.Button(
             mainframe,
             command=self.generate_ntrans_dictionary,
@@ -121,6 +124,8 @@ class NTransMainGui:
             style="W.TButton",
         )
 
+        # Warning for not all settings defined
+        self.setting_not_defined_warning = ttk.Label(mainframe, text="All fields need to be filled in to start.", style="W.TLabel")
         # Estimated Time
         self.estimated_time_label = ttk.Label(mainframe)
         self.update_estimated_time_label()
@@ -181,6 +186,7 @@ class NTransMainGui:
         get_savepath_button.grid(sticky="W", column=1, row=13, padx=(0, 20), pady=(0, 0))
 
         generate_dictionary.grid(column=0, columnspan=2, padx=(0, 0), pady=(0, 0))
+        self.setting_not_defined_warning.grid(column=0, row=15, columnspan=2, padx=(0, 0), pady=(0, 0))
         self.estimated_time_label.grid(sticky="W", column=0, columnspan=2, padx=(30, 0), pady=(0, 0))
 
         about_help_buttonframe.grid(sticky="E", column=0, row=17, columnspan=2, padx=(20, 20), pady=(20, 10))
@@ -212,6 +218,12 @@ class NTransMainGui:
             "target_language": self.target_language_var.get(),
         }
 
+    def flash_warning_label(self):
+        # print("In flashing method")
+        # self.style_options.configure("W.TLabel", foreground="white")
+        # self.style_options.configure("W.TLabel", foreground="red")
+        pass
+
     def update_user_choice_vars(self, *junk: object) -> None:
         self.user_choices = {
             "save_path": self.filepath.get(),
@@ -221,6 +233,12 @@ class NTransMainGui:
             "amount_of_ngrams": self.data_size_var.get(),
             "target_language": self.target_language_var.get(),
         }
+
+        for value in self.user_choices.values():
+            if not value:
+                self.setting_not_defined_warning.grid()
+                return
+        self.setting_not_defined_warning.grid_remove()
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
@@ -232,6 +250,7 @@ class NTransMainGui:
         # TEST
         for key, value in self.user_choices.items():
             if not value:
+                self.flash_warning_label()
                 return
 
         # TODO: Check filepath for validity
@@ -297,19 +316,23 @@ class NTransMainGui:
             * len([n for n, var in self.checkbox_vars.items() if var.get()])
             * 1.2
         )  # The average time taken is 1.2 sec per string translated
-        if total_time_in_seconds >= 60:
+        if total_time_in_seconds >= 60 * 60:
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated run time: {int(total_time_in_seconds / 60 / 60)} h & {int(total_time_in_seconds / 60 % 60)} min"
+        elif total_time_in_seconds >= 60:
             if total_time_in_seconds % 60 == 0:
                 self.estimated_time_label[
                     "text"
-                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min"
+                ] = f"Estimated run time: {int(total_time_in_seconds / 60)} min"
             else:
                 self.estimated_time_label[
                     "text"
-                ] = f"Estimated time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
+                ] = f"Estimated run time: {int(total_time_in_seconds / 60)} min & {total_time_in_seconds % 60} sec"
         else:
             self.estimated_time_label[
                 "text"
-            ] = f"Estimated time: {total_time_in_seconds} sec"
+            ] = f"Estimated run time: {total_time_in_seconds} sec"
 
 
 class ProgressIndicator:
