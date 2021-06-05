@@ -17,7 +17,7 @@ class NTransMainGui:
 
     def __init__(self) -> None:
         self.thread: Optional[threading.Thread] = None
-        self.cancel_thread_event: threading.Event = threading.Event()
+        self.cancel_thread_event = threading.Event()
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
