@@ -125,6 +125,20 @@ class NTransMainGui:
         self.estimated_time_label = ttk.Label(mainframe)
         self.update_estimated_time_label()
 
+        # Progress Indication
+        self.progress_frame = ttk.Frame(mainframe)
+        self.progress_indicator = ProgressIndicator(self.progress_frame)
+
+        self.progress_indicator.progress_bar.grid(
+            column=0, row=0, padx=(0, 0), pady=(0, 0)
+        )
+        self.progress_indicator.percentage_label.grid(
+            column=1, row=0, padx=(5, 0), pady=(0, 0)
+        )
+        self.progress_indicator.cancel_button.grid(
+            column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
+        )
+
         # About / Help
         about_help_buttonframe = ttk.Frame(mainframe)
 
@@ -140,20 +154,6 @@ class NTransMainGui:
 
         about_button.pack(side="left")
         help_button.pack(side="right")
-
-        # Progress Indication
-        self.progress_frame = ttk.Frame(mainframe)
-        self.progress_indicator = ProgressIndicator(self.progress_frame)
-
-        self.progress_indicator.progress_bar.grid(
-            column=0, row=0, padx=(0, 0), pady=(0, 0)
-        )
-        self.progress_indicator.percentage_label.grid(
-            column=1, row=0, padx=(5, 0), pady=(0, 0)
-        )
-        self.progress_indicator.cancel_button.grid(
-            column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
-        )
 
         # Black turn off formatting
         # fmt: off
@@ -188,18 +188,22 @@ class NTransMainGui:
         # Black turn on formatting
         # fmt: on
 
+        self.filepath.trace_add("write", self.update_user_choice_vars)
+        self.target_language_var.trace_add("write", self.update_user_choice_vars)
+        for var in self.checkbox_vars.values():
+            var.trace_add("write", self.update_user_choice_vars)
+
+        self.select_all_var.trace_add("write", self.update_user_choice_vars)
+        self.data_size_var.trace_add("write", self.update_user_choice_vars)
+        for var in self.checkbox_vars.values():
+            var.trace_add("write", self.update_user_choice_vars)
+
         self.select_all_var.trace_add("write", self.update_estimated_time_label)
         self.data_size_var.trace_add("write", self.update_estimated_time_label)
         for var in self.checkbox_vars.values():
             var.trace_add("write", self.update_estimated_time_label)
 
-    def get_save_file_path(self) -> None:
-        savepath = tkinter.filedialog.askdirectory()  # type: ignore
-        if savepath:
-            self.filepath.set(savepath)
-
-    def generate_ntrans_dictionary(self) -> None:
-        user_choices = {
+        self.user_choices = {
             "save_path": self.filepath.get(),
             "included_ngrams": [
                 n for n, var in self.checkbox_vars.items() if var.get()
@@ -208,19 +212,35 @@ class NTransMainGui:
             "target_language": self.target_language_var.get(),
         }
 
-        for key in user_choices:
-            if not user_choices[key]:
-                print(
-                    "All fields need to be filled in before generating the N-Trans dictionary."
-                )  # TODO: Change print to label
-                break
+    def update_user_choice_vars(self, *junk: object) -> None:
+        self.user_choices = {
+            "save_path": self.filepath.get(),
+            "included_ngrams": [
+                n for n, var in self.checkbox_vars.items() if var.get()
+            ],
+            "amount_of_ngrams": self.data_size_var.get(),
+            "target_language": self.target_language_var.get(),
+        }
+
+    def get_save_file_path(self) -> None:
+        savepath = tkinter.filedialog.askdirectory()  # type: ignore
+        if savepath:
+            self.filepath.set(savepath)
+
+    def generate_ntrans_dictionary(self) -> None:
+
+        # TEST
+        for key, value in self.user_choices.items():
+            if not value:
+                return
 
         # TODO: Check filepath for validity
         if not hasattr(ntrans_gui, "thread"):
             self.progress_queue = queue.Queue()
             # Calls logic in ntrans.py
             self.thread = threading.Thread(
-                target=ntrans.read_ngram_files, args=[user_choices, self.progress_queue]
+                target=ntrans.read_ngram_files,
+                args=[self.user_choices, self.progress_queue],
             )
             self.thread.start()
 
