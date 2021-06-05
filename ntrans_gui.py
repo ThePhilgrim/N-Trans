@@ -205,15 +205,15 @@ class NTransMainGui:
 
         self.update_estimated_time_label()
 
-    def flash_warning_label(self) -> None:
-        for flash in range(3):
-            self.style_options.configure("W.TLabel", foreground="orange")
-            self.root.update()  # type: ignore
-            time.sleep(0.07)
-            self.style_options.configure("W.TLabel", foreground="red")
-            self.root.update()  # type: ignore
-            time.sleep(0.07)
-        # self.style_options.configure("W.TLabel", foreground="red")
+    def get_save_file_path(self) -> None:
+        savepath = tkinter.filedialog.askdirectory()  # type: ignore
+        if savepath:
+            self.filepath.set(savepath)
+
+    def control_path_validity(
+        self,
+    ) -> None:  # TODO: Add logic to make sure the save path is a valid path.
+        pass
 
     def update_user_choice_vars(self, *junk: object) -> None:
         if (
@@ -225,10 +225,40 @@ class NTransMainGui:
         else:
             self.setting_not_defined_warning.grid()
 
-    def get_save_file_path(self) -> None:
-        savepath = tkinter.filedialog.askdirectory()  # type: ignore
-        if savepath:
-            self.filepath.set(savepath)
+    def select_all_ngrams(self) -> None:
+        for var in self.checkbox_vars.values():
+            var.set(self.select_all_var.get())
+
+    def update_ngram_checkbox(self, n: int) -> None:
+        self.checkbox_vars[n].get()
+
+        if not self.checkbox_vars[n].get():
+            self.select_all_var.set(False)
+
+    # *junk is random tcl stuff that trace_add wants in the callback method.
+    def update_estimated_time_label(self, *junk: object) -> None:
+        total_time_in_seconds = int(
+            self.data_size_var.get()
+            * len([n for n, var in self.checkbox_vars.items() if var.get()])
+            * 1.2
+        )  # Average time in seconds per N-gram
+
+        formatted_time = str(datetime.timedelta(seconds=total_time_in_seconds))
+        time_split = formatted_time.split(":")  # format h:mm:ss
+        if time_split[0] != "0":
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated run time: {time_split[0]} h & {time_split[1]} min."
+        elif time_split[1] != "00" and int(time_split[1]) < 10:
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated run time: {int(time_split[1])} min."
+        elif time_split[1] != "00":
+            self.estimated_time_label[
+                "text"
+            ] = f"Estimated run time: {time_split[1]} min."
+        else:
+            self.estimated_time_label["text"] = "Estimated run time: --"
 
     def generate_ntrans_dictionary(self) -> None:
         user_choices = {
@@ -275,9 +305,18 @@ class NTransMainGui:
         else:
             self.progress_frame.grid_remove()
 
-    def select_all_ngrams(self) -> None:
-        for var in self.checkbox_vars.values():
-            var.set(self.select_all_var.get())
+    def flash_warning_label(self) -> None:
+        for flash in range(3):
+            self.style_options.configure("W.TLabel", foreground="orange")
+            self.root.update()  # type: ignore
+            time.sleep(0.07)
+            self.style_options.configure("W.TLabel", foreground="red")
+            self.root.update()  # type: ignore
+            time.sleep(0.07)
+
+    def cancel_generation(self) -> None:
+        self.cancel_thread_event.set()
+        self.thread = None
 
     def open_about_window(self) -> None:
         self.about_window = AboutWindow()
@@ -286,46 +325,6 @@ class NTransMainGui:
         webbrowser.open_new_tab(
             "https://www.google.com"
         )  # TODO: Write help document and link to it
-
-    def control_path_validity(
-        self,
-    ) -> None:  # TODO: Add logic to make sure the save path is a valid path.
-        pass
-
-    def update_ngram_checkbox(self, n: int) -> None:
-        self.checkbox_vars[n].get()
-
-        if not self.checkbox_vars[n].get():
-            self.select_all_var.set(False)
-
-    # *junk is random tcl stuff that trace_add wants in the callback method.
-    def update_estimated_time_label(self, *junk: object) -> None:
-        total_time_in_seconds = int(
-            self.data_size_var.get()
-            * len([n for n, var in self.checkbox_vars.items() if var.get()])
-            * 1.2
-        )  # Average time in seconds per N-gram
-
-        formatted_time = str(datetime.timedelta(seconds=total_time_in_seconds))
-        time_split = formatted_time.split(":")  # format h:mm:ss
-        if time_split[0] != "0":
-            self.estimated_time_label[
-                "text"
-            ] = f"Estimated run time: {time_split[0]} h & {time_split[1]} min."
-        elif time_split[1] != "00" and int(time_split[1]) < 10:
-            self.estimated_time_label[
-                "text"
-            ] = f"Estimated run time: {(int(time_split[1]))} min."
-        elif time_split[1] != "00":
-            self.estimated_time_label[
-                "text"
-            ] = f"Estimated run time: {time_split[1]} min."
-        else:
-            self.estimated_time_label["text"] = "Estimated run time: --"
-
-    def cancel_generation(self) -> None:
-        self.cancel_thread_event.set()
-        self.thread = None
 
 
 class ProgressIndicator:
