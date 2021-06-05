@@ -127,7 +127,11 @@ class NTransMainGui:
         )
 
         # Warning for not all settings defined
-        self.setting_not_defined_warning = ttk.Label(mainframe, text="All fields need to be filled in to start.", style="W.TLabel")
+        self.setting_not_defined_warning = ttk.Label(
+            mainframe,
+            text="All fields need to be filled in to start.",
+            style="W.TLabel",
+        )
         # Estimated Time
         self.estimated_time_label = ttk.Label(mainframe)
         self.update_estimated_time_label()
@@ -135,16 +139,6 @@ class NTransMainGui:
         # Progress Indication
         self.progress_frame = ttk.Frame(mainframe)
         self.progress_indicator = ProgressIndicator(self.progress_frame)
-
-        self.progress_indicator.progress_bar.grid(
-            column=0, row=0, padx=(0, 0), pady=(0, 0)
-        )
-        self.progress_indicator.percentage_label.grid(
-            column=1, row=0, padx=(5, 0), pady=(0, 0)
-        )
-        self.progress_indicator.cancel_button.grid(
-            column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
-        )
 
         # About / Help
         about_help_buttonframe = ttk.Frame(mainframe)
@@ -200,47 +194,33 @@ class NTransMainGui:
         self.target_language_var.trace_add("write", self.update_user_choice_vars)
         for var in self.checkbox_vars.values():
             var.trace_add("write", self.update_user_choice_vars)
+            var.trace_add("write", self.update_estimated_time_label)
 
-        self.select_all_var.trace_add("write", self.update_user_choice_vars)
+        self.select_all_var.trace_add(
+            "write", self.update_estimated_time_label
+        )  # TODO: Is this trace needed?
         self.data_size_var.trace_add("write", self.update_user_choice_vars)
-        for var in self.checkbox_vars.values():
-            var.trace_add("write", self.update_user_choice_vars)
 
         self.select_all_var.trace_add("write", self.update_estimated_time_label)
         self.data_size_var.trace_add("write", self.update_estimated_time_label)
-        for var in self.checkbox_vars.values():
-            var.trace_add("write", self.update_estimated_time_label)
 
-        self.user_choices = {
-            "save_path": self.filepath.get(),
-            "included_ngrams": [
-                n for n, var in self.checkbox_vars.items() if var.get()
-            ],
-            "amount_of_ngrams": self.data_size_var.get(),
-            "target_language": self.target_language_var.get(),
-        }
+        self.update_estimated_time_label()
 
-    def flash_warning_label(self):
+    def flash_warning_label(self) -> None:
         # print("In flashing method")
         # self.style_options.configure("W.TLabel", foreground="white")
         # self.style_options.configure("W.TLabel", foreground="red")
-        pass
+        pass  # TODO: style.configure doesn't work.
 
     def update_user_choice_vars(self, *junk: object) -> None:
-        self.user_choices = {
-            "save_path": self.filepath.get(),
-            "included_ngrams": [
-                n for n, var in self.checkbox_vars.items() if var.get()
-            ],
-            "amount_of_ngrams": self.data_size_var.get(),
-            "target_language": self.target_language_var.get(),
-        }
-
-        for value in self.user_choices.values():
-            if not value:
-                self.setting_not_defined_warning.grid()
-                return
-        self.setting_not_defined_warning.grid_remove()
+        if not (
+            self.filepath.get()
+            and self.target_language_var.get()
+            and any(var.get() for var in self.checkbox_vars.values())
+        ):
+            self.setting_not_defined_warning.grid()
+        else:
+            self.setting_not_defined_warning.grid_remove()
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
@@ -248,40 +228,42 @@ class NTransMainGui:
             self.filepath.set(savepath)
 
     def generate_ntrans_dictionary(self) -> None:
+        user_choices = {
+            "save_path": self.filepath.get(),
+            "included_ngrams": [
+                n for n, var in self.checkbox_vars.items() if var.get()
+            ],
+            "amount_of_ngrams": self.data_size_var.get(),
+            "target_language": self.target_language_var.get(),
+        }
 
-        # TEST
-        for key, value in self.user_choices.items():
-            if not value:
+        for key in user_choices:
+            if not user_choices[key]:
                 self.flash_warning_label()
                 return
 
         # TODO: Check filepath for validity
         if self.thread is None:
-            self.progress_queue = queue.Queue()
+            self.progress_queue: queue.Queue[int] = queue.Queue()
             # Calls logic in ntrans.py
             self.thread = threading.Thread(
                 target=ntrans.read_ngram_files,
-                args=[self.user_choices, self.progress_queue],
+                args=[user_choices, self.progress_queue],
             )
             self.thread.start()
 
-        self.estimated_time_label.grid_remove()
-        self.progress_frame.grid(
-            column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
-        )
-        self.check_progressbar_queue()
+            self.estimated_time_label.grid_remove()
+            self.progress_frame.grid(
+                column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
+            )
+            self.check_progressbar_queue()
 
-    def check_progressbar_queue(self):
+    def check_progressbar_queue(self) -> None:
         try:
             current_percentage = self.progress_queue.get(block=False)
             self.progress_indicator.update_progress_value(current_percentage)
         except queue.Empty:
             pass
-
-        if self.thread is not None:
-            self.root.after(100, self.check_progressbar_queue)
-        else:
-            self.progress_frame.grid_remove()
 
         if self.thread is not None:
             self.root.after(100, self.check_progressbar_queue)
@@ -338,7 +320,7 @@ class NTransMainGui:
 
 
 class ProgressIndicator:
-    def __init__(self, parent_frame) -> None:
+    def __init__(self, parent_frame: ttk.Frame) -> None:
         self.progress_bar = ttk.Progressbar(
             parent_frame, length=250, orient="horizontal", mode="determinate"
         )
@@ -347,11 +329,19 @@ class ProgressIndicator:
 
         self.cancel_button = ttk.Button(parent_frame, text="Cancel")
 
+        self.progress_bar.grid(column=0, row=0, padx=(0, 0), pady=(0, 0))
+        self.percentage_label.grid(column=1, row=0, padx=(5, 0), pady=(0, 0))
+        # self.cancel_button.grid(
+        #     column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
+        # )
+
     def update_progress_value(self, current_percentage: int) -> None:
         self.progress_bar["value"] = current_percentage
         self.percentage_label["text"] = str(current_percentage) + "%"
 
-    def cancel_generation(self) -> None:  # TODO: Cancel button will stop the generation of N-Trans dictionary.
+    def cancel_generation(
+        self,
+    ) -> None:  # TODO: Cancel button will stop the generation of N-Trans dictionary.
         ntrans_gui.thread = None
 
 
