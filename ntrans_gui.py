@@ -151,9 +151,9 @@ class NTransMainGui:
         self.progress_indicator.percentage_label.grid(
             column=1, row=0, padx=(5, 0), pady=(0, 0)
         )
-        self.progress_indicator.cancel_button.grid(
-            column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
-        )
+        # self.progress_indicator.cancel_button.grid(
+        #     column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
+        # )  # TODO: Add cancel button to progress frame
 
         # Black turn off formatting
         # fmt: off
@@ -217,7 +217,7 @@ class NTransMainGui:
 
         # TODO: Check filepath for validity
         if not hasattr(ntrans_gui, "thread"):
-            self.progress_queue = queue.Queue()
+            self.progress_queue: queue.Queue[int] = queue.Queue()
             # Calls logic in ntrans.py
             self.thread = threading.Thread(
                 target=ntrans.read_ngram_files, args=[user_choices, self.progress_queue]
@@ -226,14 +226,14 @@ class NTransMainGui:
 
         self.open_progress_bar()
 
-    def open_progress_bar(self):
+    def open_progress_bar(self) -> None:
         self.estimated_time_label.grid_remove()
         self.progress_frame.grid(
             column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
         )
         self.check_progressbar_queue()
 
-    def check_progressbar_queue(self):
+    def check_progressbar_queue(self) -> None:
         try:
             current_percentage = self.progress_queue.get(block=False)
             self.progress_indicator.update_progress_value(current_percentage)
@@ -293,7 +293,7 @@ class NTransMainGui:
 
 
 class ProgressIndicator:
-    def __init__(self, parent_frame) -> None:
+    def __init__(self, parent_frame: ttk.Frame) -> None:
         self.progress_bar = ttk.Progressbar(
             parent_frame, length=250, orient="horizontal", mode="determinate"
         )
@@ -302,14 +302,14 @@ class ProgressIndicator:
 
         self.cancel_button = ttk.Button(parent_frame, text="Cancel")
 
-    def update_progress_value(self, current_percentage):
+    def update_progress_value(self, current_percentage: int) -> None:
         self.progress_bar["value"] = current_percentage
         self.percentage_label["text"] = str(current_percentage) + "%"
 
-    def update_progress_label(self, current_percentage):
+    def update_progress_label(self, current_percentage: int) -> None:
         pass
 
-    def cancel_generation(self):
+    def cancel_generation(self) -> None:
         pass
 
 
