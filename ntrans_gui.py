@@ -17,6 +17,7 @@ class NTransMainGui:
 
     def __init__(self) -> None:
         self.thread: Optional[threading.Thread] = None
+        self.cancel_thread_event: threading.Event = threading.Event()
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -140,6 +141,11 @@ class NTransMainGui:
         self.progress_frame = ttk.Frame(mainframe)
         self.progress_indicator = ProgressIndicator(self.progress_frame)
 
+        self.cancel_button = ttk.Button(
+            self.progress_frame, text="Cancel", command=self.cancel_generation
+        )
+        self.cancel_button.grid(column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0))
+
         # About / Help
         about_help_buttonframe = ttk.Frame(mainframe)
 
@@ -196,9 +202,6 @@ class NTransMainGui:
             var.trace_add("write", self.update_user_choice_vars)
             var.trace_add("write", self.update_estimated_time_label)
 
-        self.select_all_var.trace_add(
-            "write", self.update_estimated_time_label
-        )  # TODO: Is this trace needed?
         self.data_size_var.trace_add("write", self.update_user_choice_vars)
 
         self.select_all_var.trace_add("write", self.update_estimated_time_label)
@@ -217,14 +220,14 @@ class NTransMainGui:
         # self.style_options.configure("W.TLabel", foreground="red")
 
     def update_user_choice_vars(self, *junk: object) -> None:
-        if not (
+        if (
             self.filepath.get()
             and self.target_language_var.get()
             and any(var.get() for var in self.checkbox_vars.values())
         ):
-            self.setting_not_defined_warning.grid()
-        else:
             self.setting_not_defined_warning.grid_remove()
+        else:
+            self.setting_not_defined_warning.grid()
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
@@ -252,7 +255,7 @@ class NTransMainGui:
             # Calls logic in ntrans.py
             self.thread = threading.Thread(
                 target=ntrans.read_ngram_files,
-                args=[user_choices, self.progress_queue],
+                args=[user_choices, self.progress_queue, self.cancel_thread_event],
             )
             self.thread.start()
 
@@ -322,6 +325,11 @@ class NTransMainGui:
                 "text"
             ] = f"Estimated run time: {total_time_in_seconds} sec"
 
+    def cancel_generation(self) -> None:
+        self.cancel_thread_event.set()
+        self.thread = None
+        self.cancel_thread_event.clear()
+
 
 class ProgressIndicator:
     def __init__(self, parent_frame: ttk.Frame) -> None:
@@ -331,22 +339,12 @@ class ProgressIndicator:
 
         self.percentage_label = ttk.Label(parent_frame)
 
-        self.cancel_button = ttk.Button(parent_frame, text="Cancel")
-
         self.progress_bar.grid(column=0, row=0, padx=(0, 0), pady=(0, 0))
         self.percentage_label.grid(column=1, row=0, padx=(5, 0), pady=(0, 0))
-        # self.cancel_button.grid(
-        #     column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0)
-        # )
 
     def update_progress_value(self, current_percentage: int) -> None:
         self.progress_bar["value"] = current_percentage
         self.percentage_label["text"] = str(current_percentage) + "%"
-
-    def cancel_generation(
-        self,
-    ) -> None:  # TODO: Cancel button will stop the generation of N-Trans dictionary.
-        ntrans_gui.thread = None
 
 
 class AboutWindow:
