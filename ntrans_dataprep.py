@@ -101,13 +101,7 @@ def generate_ngrams_from_corpus() -> None:
     """
     # TODO: Update Docstring to explain csv split process
 
-    n_to_ngrams: Dict[int, List[NGram]] = {
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-        6: [],
-    }
+    n_to_ngrams: Dict[int, List[NGram]] = {2: [], 3: [], 4: [], 5: [], 6: []}
 
     # Extracts <class 'nltk.corpus.reader.bnc.BNCSentence'> from BNC
     bnc_corpus = nltk.corpus.BNCCorpusReader(

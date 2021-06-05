@@ -7,6 +7,7 @@ from __future__ import annotations
 import translatepy  # type: ignore
 import csv
 import queue
+import threading
 from typing import List, Dict, Tuple, Any
 
 
@@ -38,6 +39,7 @@ def machine_translate_ngrams(
     ngrams: Dict[int, List[str]],
     user_choices: Dict[str, Any],
     progress_queue: queue.Queue[int],
+    cancel_thread_event: threading.Event,
 ) -> None:
     """
     Translates each N-gram and appends the source/target pair to a list.
@@ -52,6 +54,8 @@ def machine_translate_ngrams(
 
     for key, value in ngrams.items():
         for enum, source_ngram in enumerate(value, start=1):
+            if cancel_thread_event.is_set():
+                return
             target_ngram = str(
                 translator.translate(source_ngram, user_choices["target_language"])
             ).lower()
@@ -62,7 +66,9 @@ def machine_translate_ngrams(
 
 
 def read_ngram_files(
-    user_choices: Dict[str, Any], progress_queue: queue.Queue[int]
+    user_choices: Dict[str, Any],
+    progress_queue: queue.Queue[int],
+    cancel_thread_event: threading.Event,
 ) -> None:
     """
     Reads N-gram files depending on which N-grams the user wants to output.
@@ -80,7 +86,7 @@ def read_ngram_files(
                     break
                 ngrams[n].append(row[0])
 
-    machine_translate_ngrams(ngrams, user_choices, progress_queue)
+    machine_translate_ngrams(ngrams, user_choices, progress_queue, cancel_thread_event)
 
 
 # read_ngram_files()
