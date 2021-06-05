@@ -37,7 +37,7 @@ def create_csv_file(
 def machine_translate_ngrams(
     ngrams: Dict[int, List[str]],
     user_choices: Dict[str, Any],
-    progress_queue: queue.Queue[float],
+    progress_queue: queue.Queue[int],
 ) -> None:
     """
     Translates each N-gram and appends the source/target pair to a list.
@@ -62,7 +62,7 @@ def machine_translate_ngrams(
 
 
 def read_ngram_files(
-    user_choices: Dict[str, Any], progress_queue: queue.Queue[float]
+    user_choices: Dict[str, Any], progress_queue: queue.Queue[int]
 ) -> None:
     """
     Reads N-gram files depending on which N-grams the user wants to output.
