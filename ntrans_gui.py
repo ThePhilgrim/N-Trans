@@ -7,8 +7,9 @@ import threading
 import queue
 import time
 import datetime
+import json
 from tkinter import ttk
-from typing import Optional
+from typing import Optional, List
 
 
 class NTransMainGui:
@@ -27,37 +28,37 @@ class NTransMainGui:
         mainframe = ttk.Frame(self.root)
         mainframe.pack(fill="both", expand=True)
 
-        header = ttk.Label(
+        self.header = ttk.Label(
             mainframe, text="N-Trans Dictionary Settings", font=("TkDefaultFont", 18)
         )
 
         # Get directory path to save csv file
         # TODO: Add default save path depending on OS
-        get_savepath_button = ttk.Button(
+        self.get_savepath_button = ttk.Button(
             mainframe, command=self.get_save_file_path, text="Browse..."
         )
 
         self.filepath = tkinter.StringVar()
 
-        filepath_label = ttk.Label(mainframe, text="Save N-Trans dictionary to")
+        self.filepath_label = ttk.Label(mainframe, text="Save N-Trans dictionary to")
 
-        show_filepath = ttk.Entry(mainframe, textvariable=self.filepath, width=25)
+        self.show_filepath = ttk.Entry(mainframe, textvariable=self.filepath, width=25)
 
         # What N-Grams to include in csv file.
-        ngram_check_label = ttk.Label(mainframe, text="Choose N-grams to include")
+        self.ngram_check_label = ttk.Label(mainframe, text="Choose N-grams to include")
 
         self.select_all_var = tkinter.BooleanVar(value=True)
 
         self.checkbox_vars = {n: tkinter.BooleanVar(value=True) for n in range(2, 7)}
 
-        select_all_checkbutton = ttk.Checkbutton(
+        self.select_all_checkbutton = ttk.Checkbutton(
             mainframe,
             text="Select/Deselect all",
             variable=self.select_all_var,
             command=self.select_all_ngrams,
         )
 
-        n_to_ngram_checkbox = {
+        self.n_to_ngram_checkbox = {
             n: ttk.Checkbutton(
                 mainframe,
                 text=f"{n}-grams",
@@ -68,32 +69,29 @@ class NTransMainGui:
         }
 
         # What language to translate into
-        target_language_label = ttk.Label(mainframe, text="Target language")
+        self.target_language_label = ttk.Label(mainframe, text="Target language")
 
         self.target_language_var = tkinter.StringVar()
 
-        target_language = ttk.Combobox(
+        self.target_language = ttk.Combobox(
             mainframe, state="readonly", textvariable=self.target_language_var
         )
 
-        target_language["values"] = (
-            "German",
-            "Spanish",
-            "French",
-            "Swedish",
-            "Italian",
-        )
+        self.target_language["values"] = self.get_target_languages()
 
         # How many of each N-Gram to translate
-        data_size_label = ttk.Label(mainframe, text="Amount of each N-gram to include")
+        self.data_size_label = ttk.Label(
+            mainframe, text="Amount of each N-gram to include"
+        )
 
         self.data_size_var = tkinter.IntVar()
 
-        ngram_data_size = ttk.Combobox(
+        self.ngram_data_size = ttk.Combobox(
             mainframe, state="readonly", textvariable=self.data_size_var
         )
 
-        ngram_data_size["values"] = (
+        self.ngram_data_size["values"] = (
+            5,
             50,
             100,
             300,
@@ -106,7 +104,7 @@ class NTransMainGui:
             10000,
         )
 
-        ngram_data_size.current(6)
+        self.ngram_data_size.current(6)
 
         # Generate Button
         self.style_options = ttk.Style()
@@ -116,7 +114,7 @@ class NTransMainGui:
 
         self.style_options.configure("W.TLabel", foreground="red")
 
-        generate_dictionary = ttk.Button(
+        self.generate_dictionary = ttk.Button(
             mainframe,
             command=self.generate_ntrans_dictionary,
             text="Generate N-Trans Dictionary",
@@ -143,54 +141,22 @@ class NTransMainGui:
         self.cancel_button.grid(column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0))
 
         # About / Help
-        about_help_buttonframe = ttk.Frame(mainframe)
+        self.about_help_buttonframe = ttk.Frame(mainframe)
 
-        about_button = ttk.Button(
-            about_help_buttonframe,
+        self.about_button = ttk.Button(
+            self.about_help_buttonframe,
             command=self.open_about_window,
             text="About",
             style="",
         )  # TODO: Make command into lambda instantiating about-class
-        help_button = ttk.Button(
-            about_help_buttonframe, command=self.open_help_page, text="Help"
+        self.help_button = ttk.Button(
+            self.about_help_buttonframe, command=self.open_help_page, text="Help"
         )
 
-        about_button.pack(side="left")
-        help_button.pack(side="right")
+        self.about_button.pack(side="left")
+        self.help_button.pack(side="right")
 
-        # Black turn off formatting
-        # fmt: off
-
-        # ==================
-        # Widget placement
-        # ==================
-        header.grid(column=0, columnspan=2, padx=(0, 0), pady=(30, 30))
-
-        ngram_check_label.grid(sticky="N", column=0, padx=(0, 0), pady=(10, 10))
-
-        select_all_checkbutton.grid(sticky="W", column=0, padx=(40, 0), pady=(0, 10))
-
-        for checkbox in n_to_ngram_checkbox.values():
-            checkbox.grid(sticky="W", column=0, padx=(40, 0), pady=(0, 0))
-
-        data_size_label.grid(sticky="W", column=0, padx=(20, 0), pady=(30, 0))
-        ngram_data_size.grid(sticky="W", column=0, padx=(20, 0), pady=(5, 0))
-
-        target_language_label.grid(sticky="W", column=0, padx=(20, 20), pady=(30, 0))
-        target_language.grid(sticky="W", column=0, padx=(20, 20), pady=(0, 0))
-
-        filepath_label.grid(sticky="W", column=0, padx=(20, 0), pady=(30, 10))
-        show_filepath.grid(sticky="W", column=0, padx=(20, 0), pady=(0, 0))
-        get_savepath_button.grid(sticky="W", column=1, row=13, padx=(0, 20), pady=(0, 0))
-
-        generate_dictionary.grid(column=0, columnspan=2, padx=(0, 0), pady=(0, 0))
-        self.setting_not_defined_warning.grid(column=0, row=15, columnspan=2, padx=(0, 0), pady=(0, 0))
-        self.estimated_time_label.grid(sticky="W", column=0, columnspan=2, padx=(30, 0), pady=(0, 0))
-
-        about_help_buttonframe.grid(sticky="E", column=0, row=17, columnspan=2, padx=(20, 20), pady=(20, 10))
-
-        # Black turn on formatting
-        # fmt: on
+        self.display_ui_elements()
 
         self.filepath.trace_add("write", self.update_user_choice_vars)
         self.target_language_var.trace_add("write", self.update_user_choice_vars)
@@ -204,6 +170,40 @@ class NTransMainGui:
         self.data_size_var.trace_add("write", self.update_estimated_time_label)
 
         self.update_estimated_time_label()
+
+    def display_ui_elements(self) -> None:
+        # Black turn off formatting
+        # fmt: off
+        self.header.grid(column=0, columnspan=2, padx=(0, 0), pady=(30, 30))
+
+        self.ngram_check_label.grid(sticky="N", column=0, padx=(0, 0), pady=(10, 10))
+
+        self.select_all_checkbutton.grid(sticky="W", column=0, padx=(40, 0), pady=(0, 10))
+
+        for checkbox in self.n_to_ngram_checkbox.values():
+            checkbox.grid(sticky="W", column=0, padx=(40, 0), pady=(0, 0))
+
+        self.data_size_label.grid(sticky="W", column=0, padx=(20, 0), pady=(30, 0))
+        self.ngram_data_size.grid(sticky="W", column=0, padx=(20, 0), pady=(5, 0))
+
+        self.target_language_label.grid(sticky="W", column=0, padx=(20, 20), pady=(30, 0))
+        self.target_language.grid(sticky="W", column=0, padx=(20, 20), pady=(0, 0))
+
+        self.filepath_label.grid(sticky="W", column=0, padx=(20, 0), pady=(30, 10))
+        self.show_filepath.grid(sticky="W", column=0, padx=(20, 0), pady=(0, 0))
+        self.get_savepath_button.grid(sticky="W", column=1, row=13, padx=(0, 20), pady=(0, 0))
+
+        self.generate_dictionary.grid(column=0, columnspan=2, padx=(0, 0), pady=(0, 0))
+        self.setting_not_defined_warning.grid(column=0, row=15, columnspan=2, padx=(0, 0), pady=(0, 0))
+        self.estimated_time_label.grid(sticky="W", column=0, columnspan=2, padx=(30, 0), pady=(0, 0))
+
+        self.about_help_buttonframe.grid(sticky="E", column=0, row=17, columnspan=2, padx=(20, 20), pady=(20, 10))
+        # fmt: on
+
+    def get_target_languages(self) -> List[str]:
+        with open("target_languages.json", "r") as target_language_file:
+            target_languages = json.load(target_language_file)
+            return target_languages["target_languages"]  # type: ignore
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
