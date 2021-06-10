@@ -208,7 +208,7 @@ class NTransMainGui:
             return target_languages
 
     def get_save_file_path(self) -> None:
-        savepath = tkinter.filedialog.askdirectory()
+        savepath = tkinter.filedialog.askdirectory()  # type: ignore
         if savepath:
             self.filepath.set(savepath)
 
