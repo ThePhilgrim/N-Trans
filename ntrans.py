@@ -28,7 +28,7 @@ def create_csv_file(
     with open(full_path, mode="w") as write_ntrans_file:
         data_writer = csv.writer(write_ntrans_file, delimiter=",")
 
-        data_writer.writerow(("English", "Swedish"))
+        data_writer.writerow(("English", user_choices["target_language"]))
         for source_target_pair in source_target_pairs:
             data_writer.writerow(source_target_pair)
 
