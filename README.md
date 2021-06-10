@@ -29,7 +29,7 @@ Please return to this page regularly to stay updated with the progress of develo
 N-Trans is split into three phases.
 
 1) In `ntrans_dataprep.py`, sentences from the BNC are processed and, split into N-grams, and written
-to .csv files in chunks of 300K sentences.
+to .csv files in chunks of 300K sentences. (In total, 105 .csv files are created).
 
 2) In `ntrans_combine.py`, the frequency of each N-gram is counted with `collections.Counter`. The 10K
 most frequent N-grams are thereafter written to a new .csv file. One file is created for each N-gram
@@ -37,6 +37,26 @@ most frequent N-grams are thereafter written to a new .csv file. One file is cre
 
 3) `ntrans.py` is the main program which the end user is exposed to. Here, the X most frequent N-grams
 will be machine translated to a chosen target language, and the source-target pair is written to a .csv file.
+
+### GUI & Data
+
+#### GUI
+The N-Trans GUI is written in tkinter, in combination with ttk.
+Sadly, this results in significant GUI inconsistencies across systems. The GUI was written on
+and has been optimized for Mac OS.
+
+If you are on Linux or Windows, you are more than welcome to contribute to the GUI optimization of
+these systems.
+
+
+#### Data
+The data is collected from the BNC with the help of the NLTK library. The hope is that more corpora
+will be implemented in the future. Both to diversify the source data, and also to support more source languages.
+
+The target languages are a selection from the available languages of the translatepy library.
+The full list of available languages can be found in the translatepy repository.
+
+N-Trans imports its supported target languages from `target_languages.json`.
 
 ### Development
 
@@ -54,7 +74,7 @@ To activate a virtual environment:
 - Windows:
   `env\Scripts\activate`
 
-### Install Dependencies
+#### Install Dependencies
 
 To install the dependencies needed to develop & test N-Trans, run inside the virtualenv:
 
@@ -63,7 +83,7 @@ To install the dependencies needed to develop & test N-Trans, run inside the vir
 - Windows:
   `py -m pip install -r requirements.txt`
 
-### Formatting
+#### Formatting
 
 This project uses Black to format the code. Please use Black before creating a PR.
 

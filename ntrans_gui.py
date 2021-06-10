@@ -202,11 +202,13 @@ class NTransMainGui:
 
     def get_target_languages(self) -> List[str]:
         with open("target_languages.json", "r") as target_language_file:
-            result: List[str] = json.load(target_language_file)["target_languages"]
-            return result
+            target_languages: List[str] = json.load(target_language_file)[
+                "target_languages"
+            ]
+            return target_languages
 
     def get_save_file_path(self) -> None:
-        savepath = tkinter.filedialog.askdirectory()  # type: ignore
+        savepath = tkinter.filedialog.askdirectory()
         if savepath:
             self.filepath.set(savepath)
 
@@ -307,10 +309,10 @@ class NTransMainGui:
     def flash_warning_label(self) -> None:
         for flash in range(3):
             self.style_options.configure("W.TLabel", foreground="orange")
-            self.root.update()  # type: ignore
+            self.root.update()
             time.sleep(0.07)
             self.style_options.configure("W.TLabel", foreground="red")
-            self.root.update()  # type: ignore
+            self.root.update()
             time.sleep(0.07)
 
     def cancel_generation(self) -> None:
