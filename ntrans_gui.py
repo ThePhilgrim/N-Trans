@@ -202,8 +202,8 @@ class NTransMainGui:
 
     def get_target_languages(self) -> List[str]:
         with open("target_languages.json", "r") as target_language_file:
-            target_languages = json.load(target_language_file)
-            return target_languages["target_languages"]  # type: ignore
+            result: List[str] = json.load(target_language_file)["target_languages"]
+            return result
 
     def get_save_file_path(self) -> None:
         savepath = tkinter.filedialog.askdirectory()  # type: ignore
