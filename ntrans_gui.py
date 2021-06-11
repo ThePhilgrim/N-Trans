@@ -281,11 +281,11 @@ class NTransMainGui:
 
         if self.thread is None:
             self.progress_queue: queue.Queue[int] = queue.Queue()
-            # Calls logic in ntrans.py
-            self.thread = threading.Thread(
-                target=ntrans.read_ngram_files,
-                args=[user_choices, self.progress_queue, self.cancel_thread_event],
+            glossary_generator = ntrans.GlossaryGenerator(
+                user_choices, self.progress_queue, self.cancel_thread_event
             )
+            # Calls logic in ntrans.py
+            self.thread = threading.Thread(target=glossary_generator.read_ngram_files)
             self.thread.start()
 
             self.estimated_time_label.grid_remove()
