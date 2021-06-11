@@ -34,9 +34,7 @@ class GlossaryGenerator:
         filename = "ntrans-glossary.csv"  # TODO: Make filename depend on user input
 
         with open(f"{save_path}/{filename}", mode="w") as write_ntrans_file:
-            data_writer = csv.writer(
-                write_ntrans_file, delimiter=","
-            )  # TODO: delimiter default == , ?
+            data_writer = csv.writer(write_ntrans_file)
 
             data_writer.writerow(("English", self.user_choices["target_language"]))
             for source_target_pair in source_target_pairs:
