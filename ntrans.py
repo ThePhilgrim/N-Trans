@@ -20,10 +20,12 @@ class GlossaryGenerator:
         user_choices: Dict[str, Any],
         progress_queue: queue.Queue[int],
         cancel_thread_event: threading.Event,
+        generation_finished_event: threading.Event,
     ) -> None:
         self.user_choices = user_choices
         self.progress_queue = progress_queue
         self.cancel_thread = cancel_thread_event
+        self.generation_finished_event = generation_finished_event
 
     def create_csv_file(self, source_target_pairs: List[SourceTarget]) -> None:
         """
@@ -40,8 +42,6 @@ class GlossaryGenerator:
             for source_target_pair in source_target_pairs:
                 data_writer.writerow(source_target_pair)
 
-        # TODO: Add label to GUI when file created and generation finished.
-        print("Done.")
         return
 
     def machine_translate_ngrams(self, ngrams: Dict[int, List[str]]) -> None:
