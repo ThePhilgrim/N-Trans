@@ -20,6 +20,7 @@ class NTransMainGui:
     def __init__(self) -> None:
         self.thread: Optional[threading.Thread] = None
         self.cancel_thread_event = threading.Event()
+        self.generation_finished_event = threading.Event()
         # Window & Frame
         self.root = tkinter.Tk()
         self.root.resizable(False, False)
@@ -139,6 +140,9 @@ class NTransMainGui:
             self.progress_frame, text="Cancel", command=self.cancel_generation
         )
         self.cancel_button.grid(column=0, row=1, columnspan=2, padx=(0, 0), pady=(0, 0))
+
+        # Generation Finished Frame
+        self.on_finished_frame = ttk.Frame(mainframe)
 
         # About / Help
         self.about_help_buttonframe = ttk.Frame(mainframe)
@@ -278,21 +282,53 @@ class NTransMainGui:
                 return
 
         self.cancel_thread_event.clear()
+        self.generation_finished_event.clear()
 
         if self.thread is None:
             self.progress_queue: queue.Queue[int] = queue.Queue()
             glossary_generator = ntrans.GlossaryGenerator(
-                user_choices, self.progress_queue, self.cancel_thread_event
+                user_choices,
+                self.progress_queue,
+                self.cancel_thread_event,
+                self.generation_finished_event,
             )
             # Calls logic in ntrans.py
-            self.thread = threading.Thread(target=glossary_generator.read_ngram_files)
+            self.thread = threading.Thread(
+                target=glossary_generator.read_ngram_files, daemon=True
+            )
             self.thread.start()
 
             self.estimated_time_label.grid_remove()
             self.progress_frame.grid(
                 column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
             )
+
             self.check_progressbar_queue()
+            self.check_if_finished()
+
+    def check_if_finished(self) -> None:
+        # Assert needed for mypy
+        assert self.thread is not None
+        if self.thread.is_alive():
+            self.root.after(500, self.check_if_finished)
+            return
+
+        if self.cancel_thread_event.is_set():
+            return
+
+        self.progress_frame.grid_remove()
+
+        finished_label1 = ttk.Label(self.on_finished_frame, text="Happy days!")
+        finished_label2 = ttk.Label(
+            self.on_finished_frame,
+            text="Your N-Trans Dictionary was successfully created!",
+        )
+        finished_label1.grid(column=0, columnspan=2)
+        finished_label2.grid(column=0, columnspan=2, padx=(5, 5))
+        self.on_finished_frame.grid(
+            column=0, row=16, columnspan=2, padx=(0, 0), pady=(20, 40)
+        )
+        self.thread = None
 
     def check_progressbar_queue(self) -> None:
         try:
